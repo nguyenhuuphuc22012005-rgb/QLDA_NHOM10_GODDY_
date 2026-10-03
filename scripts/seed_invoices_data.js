@@ -136,10 +136,37 @@ async function seedInvoicesData() {
       console.log(`     - [${inv.invoiceCode}] Khách hàng ID: ${inv.clientId} | Tổng tiền: ${inv.totalAmount.toLocaleString()}đ | Trạng thái: ${inv.status}`);
     });
 
+    // Tạo Payments tương ứng cho các hóa đơn đã thanh toán để đảm bảo toàn vẹn dữ liệu
+    const { Payment } = require('../models');
+    const invSeed1 = createdInvoices.find(i => i.invoiceCode === 'INV-SEED-2026-0001');
+    const invSeed2 = createdInvoices.find(i => i.invoiceCode === 'INV-SEED-2026-0002');
+
+    if (invSeed1) {
+      await Payment.create({
+        invoiceId: invSeed1.id,
+        amount: 69984000.00,
+        paymentDate: pastDueDateStr,
+        paymentMethod: 'BankTransfer',
+        referenceCode: 'UNC-SEED-FPT-001',
+        notes: 'Thanh toán tất toán 100% hóa đơn INV-SEED-2026-0001'
+      });
+    }
+
+    if (invSeed2) {
+      await Payment.create({
+        invoiceId: invSeed2.id,
+        amount: 40000000.00,
+        paymentDate: pastDueDateStr,
+        paymentMethod: 'BankTransfer',
+        referenceCode: 'UNC-SEED-VNG-002',
+        notes: 'Thanh toán đợt 1 (Partial) hóa đơn INV-SEED-2026-0002'
+      });
+    }
+
     await AuditLog.create({
       action: 'SEED_INVOICES',
       module: 'INVOICES',
-      details: `Huỳnh Nguyễn Vĩnh Phúc đã nạp 6 hóa đơn mẫu (Paid, Partial, Sent, Overdue, Draft, Cancelled) cho các đối tác Enterprise.`
+      details: `Huỳnh Nguyễn Vĩnh Phúc đã nạp 6 hóa đơn mẫu (Paid, Partial, Sent, Overdue, Draft, Cancelled) kèm các bản ghi thanh toán Payment đối soát tương ứng.`
     });
 
     console.log('\n====================================================');
