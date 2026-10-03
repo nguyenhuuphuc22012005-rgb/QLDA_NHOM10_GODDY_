@@ -1,4 +1,0 @@
-﻿Member: sv3-frontend
-Name/Account: sv3-frontend + nguyenhuuphuc22012005-rgb
-Role: Frontend Developer
-Task: Phat trien giao dien Dashboard va UI QLDA_NHOM10_GODDY_

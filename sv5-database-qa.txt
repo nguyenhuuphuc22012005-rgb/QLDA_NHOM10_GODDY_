@@ -1,4 +1,0 @@
-﻿Member: sv5-database-qa
-Name/Account: sv5-database-qa + nguyenhuuphuc22012005-rgb
-Role: Database & QA
-Task: Thiet ke co so du lieu va kiem thu chat luong QLDA_NHOM10_GODDY_
