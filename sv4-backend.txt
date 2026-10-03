@@ -1,0 +1,4 @@
+﻿Member: sv4-backend
+Name/Account: sv4-backend + nguyenhuuphuc22012005-rgb
+Role: Backend Developer
+Task: Xay dung API va xu ly nghiep vu du lieu QLDA_NHOM10_GODDY_
