@@ -1,0 +1,7 @@
+DANH SACH THANH VIEN NHOM 10 - GODDY
+====================================
+1. sv1-pm: Project Manager (Leader) - GitHub: nguyenhuuphuc22012005-rgb
+2. sv2-ba: Business Analyst - GitHub: sv2-ba
+3. sv3-frontend: Frontend Developer - GitHub: sv3-frontend
+4. sv4-backend: Backend Developer - GitHub: sv4-backend
+5. sv5-database-qa: Database & QA - GitHub: sv5-database-qa
