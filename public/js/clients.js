@@ -188,3 +188,53 @@ function exportClientsCSV() {
   });
   downloadCSV(csv, 'Danh_Sach_Khach_Hang_B2B.csv');
 }
+function exportClientsToCSV() {
+    const table = document.querySelector("table");
+
+    if (!table) {
+        alert("Không tìm thấy bảng khách hàng!");
+        return;
+    }
+
+    const rows = table.querySelectorAll("tr");
+
+    if (rows.length === 0) {
+        alert("Không có dữ liệu khách hàng để xuất!");
+        return;
+    }
+
+    const csv = [];
+
+    rows.forEach(row => {
+        const cols = row.querySelectorAll("th, td");
+
+        const data = Array.from(cols).map(col => {
+            let text = col.innerText
+                .replace(/\r?\n|\r/g, " ")
+                .replace(/"/g, '""')
+                .trim();
+
+            return `"${text}"`;
+        });
+
+        csv.push(data.join(","));
+    });
+
+    const csvContent = "\uFEFF" + csv.join("\n");
+
+    const blob = new Blob([csvContent], {
+        type: "text/csv;charset=utf-8;"
+    });
+
+    const url = URL.createObjectURL(blob);
+
+    const link = document.createElement("a");
+    link.href = url;
+    link.download = "danh_sach_khach_hang.csv";
+
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+
+    URL.revokeObjectURL(url);
+}
