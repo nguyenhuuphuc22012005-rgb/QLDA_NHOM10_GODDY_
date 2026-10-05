@@ -5,7 +5,7 @@
 * **MSSV:** `2380614923`
 * **Vai trò dự án:** Database Administrator (DBA) & Quality Assurance Tester (SV5 - Nhóm 10)
 * **Lớp:** 23DTHC3 - Khoa Công nghệ Thông tin - Trường ĐH Công nghệ TP.HCM (HUTECH)
-* **Giảng viên hướng dẫn:** ThS. Lê Quốc Anh
+* **Giảng viên hướng dẫn:** ThS. Nguyễn Hữu Trung
 * **Phạm vi hoàn thiện:** **Sprint 1 & Sprint 2 (Từ TASK-025 đến TASK-126: 24/24 Tasks hoàn tất 100%)**
 
 ---
