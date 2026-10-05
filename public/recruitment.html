@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Quản Lý Khách Hàng B2B - GODDY RECRUIT</title>
+  <title>Quản Lý Tuyển Dụng & Deal - GODDY RECRUIT</title>
   
   <!-- Google Fonts: Inter -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -39,10 +39,10 @@
       <li class="sidebar-item" onclick="switchTab('dashboard')">
         <i class="fa-solid fa-gauge-high"></i> Dashboard Thống Kê
       </li>
-      <li class="sidebar-item active" onclick="switchTab('clients')">
+      <li class="sidebar-item" onclick="switchTab('clients')">
         <i class="fa-solid fa-building-user"></i> Khách Hàng Doanh Nghiệp
       </li>
-      <li class="sidebar-item" onclick="switchTab('recruitment')">
+      <li class="sidebar-item active" onclick="switchTab('recruitment')">
         <i class="fa-solid fa-briefcase"></i> Tuyển Dụng & Deal Onboard
       </li>
       <li class="sidebar-item" onclick="switchTab('invoices')">
@@ -92,7 +92,7 @@
   <!-- MAIN WRAPPER -->
   <div class="main-wrapper">
     <header class="top-navbar">
-      <h1 class="page-title" id="pageHeaderTitle">Quản Lý Khách Hàng Doanh Nghiệp (B2B)</h1>
+      <h1 class="page-title" id="pageHeaderTitle">Quản Lý Deal Tuyển Dụng & Thời Hạn Bảo Hành</h1>
       <div class="d-flex align-items-center gap-2">
         <button class="btn btn-sm btn-outline-secondary" onclick="reloadCurrentTab()" title="Làm mới dữ liệu">
           <i class="fa-solid fa-rotate me-1"></i> Làm mới
@@ -174,276 +174,93 @@
     </header>
 
     <main class="content-container">
-<div id="section-clients" style="display: block;" style="display: block;">
+<div id="section-recruitment" style="display: block;" style="display: block;">
         <div class="table-box mt-0">
           <div class="box-header">
             <div>
-              <h3 class="box-title"><i class="fa-solid fa-building text-primary me-2"></i>Danh Sách Khách Hàng Doanh Nghiệp (B2B)</h3>
-              <div class="text-muted small mt-1">Quản lý thông tin công ty, mã số thuế và điều khoản thanh toán Net Days</div>
+              <h3 class="box-title"><i class="fa-solid fa-handshake text-success me-2"></i>Deal Tuyển Dụng Onboard & Thời Hạn Bảo Hành</h3>
+              <div class="text-muted small mt-1">Theo dõi ứng viên đi làm, phí dịch vụ hoa hồng và thời hạn bảo hành 60 ngày</div>
             </div>
             <div class="d-flex gap-2">
-              <input type="text" class="form-control form-control-sm" id="clientSearchInput" placeholder="Tìm theo tên / MST..." oninput="filterClientsTable()" style="width: 220px;">
-              <button class="btn btn-sm btn-outline-success" onclick="exportClientsCSV()"><i class="fa-solid fa-file-csv me-1"></i>Xuất CSV</button>
-              <button class="btn btn-sm btn-primary" onclick="openModalAddClient()"><i class="fa-solid fa-plus me-1"></i>Thêm Khách Hàng</button>
+              <button class="btn btn-sm btn-primary" onclick="openModalAddPlacement()"><i class="fa-solid fa-plus me-1"></i>Chốt Deal Tuyển Dụng</button>
             </div>
           </div>
           <div class="table-responsive">
             <table class="table table-hover">
               <thead>
                 <tr>
-                  <th>Doanh Nghiệp / Địa Chỉ</th>
-                  <th>Mã Số Thuế</th>
-                  <th>Người Liên Hệ</th>
-                  <th>Email & SĐT</th>
-                  <th>Hạn Thanh Toán</th>
-                  <th>Hạn Mức Nợ (Credit Limit)</th>
-                  <th>Thao Tác</th>
+                  <th>Ứng Viên</th>
+                  <th>Vị Trí Tuyển</th>
+                  <th>Khách Hàng (Công Ty)</th>
+                  <th>Lương Chính Thức</th>
+                  <th>Phí Dịch Vụ</th>
+                  <th>Ngày Hết Bảo Hành</th>
+                  <th>Trạng Thái</th>
+                  <th>Hóa Đơn</th>
                 </tr>
               </thead>
-              <tbody id="clientsTableBody"></tbody>
+              <tbody id="placementsTableBody"></tbody>
             </table>
           </div>
         </div>
       </div>
 
-      <!-- ================= SECTION 3: RECRUITMENT & PLACEMENTS ================= -->
+      <!-- ================= SECTION 4: INVOICES ================= -->
       
     </main>
   </div>
 
- <!-- ================= MODAL: THÊM KHÁCH HÀNG B2B - TASK 053 ================= -->
-<div class="modal fade" id="modalAddClient" tabindex="-1"
-     aria-labelledby="modalAddClientLabel" aria-hidden="true">
-
-  <div class="modal-dialog modal-lg modal-dialog-centered">
-
-    <div class="modal-content">
-
-      <!-- HEADER -->
-      <div class="modal-header">
-        <h5 class="modal-title" id="modalAddClientLabel">
-          <i class="fa-solid fa-building me-2 text-primary"></i>
-          Thêm Khách Hàng Doanh Nghiệp Mới
-        </h5>
-
-        <button type="button"
-                class="btn-close"
-                data-bs-dismiss="modal"
-                aria-label="Đóng"></button>
-      </div>
-
-      <!-- FORM -->
-      <form id="formAddClient" onsubmit="submitAddClient(event)">
-
-        <div class="modal-body">
-
-          <!-- TÊN DOANH NGHIỆP -->
-          <div class="mb-3">
-            <label for="newClientName" class="form-label fw-bold">
-              Tên công ty / Doanh nghiệp
-              <span class="text-danger">*</span>
-            </label>
-
-            <input type="text"
-                   class="form-control"
-                   id="newClientName"
-                   required
-                   placeholder="Ví dụ: Công ty Cổ phần Công nghệ ABC">
-          </div>
-
-          <!-- MST + ĐIỀU KHOẢN -->
-          <div class="row">
-
-            <div class="col-md-6 mb-3">
-              <label for="newClientTaxCode" class="form-label fw-bold">
-                Mã số thuế
-                <span class="text-danger">*</span>
-              </label>
-
-              <input type="text"
-                     class="form-control"
-                     id="newClientTaxCode"
-                     required
-                     pattern="[0-9]{10}([0-9]{3})?"
-                     title="Mã số thuế gồm 10 hoặc 13 chữ số"
-                     placeholder="10 hoặc 13 số">
-            </div>
-
-            <div class="col-md-6 mb-3">
-              <label for="newClientNetDays" class="form-label fw-bold">
-                Điều khoản thanh toán
-              </label>
-
-              <select class="form-select" id="newClientNetDays">
-                <option value="15">Net 15 ngày</option>
-                <option value="30" selected>
-                  Net 30 ngày (Tiêu chuẩn)
-                </option>
-                <option value="45">Net 45 ngày</option>
-                <option value="60">Net 60 ngày</option>
-              </select>
-            </div>
-
-          </div>
-
-          <!-- CREDIT LIMIT -->
-          <div class="mb-3">
-            <label for="newClientCreditLimit" class="form-label fw-bold">
-              Hạn mức công nợ tối đa (VNĐ)
-            </label>
-
-            <input type="number"
-                   class="form-control"
-                   id="newClientCreditLimit"
-                   min="0"
-                   step="100000"
-                   placeholder="Ví dụ: 50000000">
-          </div>
-
-          <!-- ĐỊA CHỈ -->
-          <div class="mb-3">
-            <label for="newClientAddress" class="form-label fw-bold">
-              Địa chỉ trụ sở
-            </label>
-
-            <input type="text"
-                   class="form-control"
-                   id="newClientAddress"
-                   placeholder="Quận / Thành phố...">
-          </div>
-
-          <!-- NGƯỜI LIÊN HỆ + ĐIỆN THOẠI -->
-          <div class="row">
-
-            <div class="col-md-6 mb-3">
-              <label for="newClientContactPerson"
-                     class="form-label fw-bold">
-                Người liên hệ
-              </label>
-
-              <input type="text"
-                     class="form-control"
-                     id="newClientContactPerson"
-                     placeholder="Họ và tên nhân sự">
-            </div>
-
-            <div class="col-md-6 mb-3">
-              <label for="newClientContactPhone"
-                     class="form-label fw-bold">
-                Số điện thoại
-              </label>
-
-              <input type="tel"
-                     class="form-control"
-                     id="newClientContactPhone"
-                     placeholder="090...">
-            </div>
-
-          </div>
-
-          <!-- EMAIL -->
-          <div class="mb-3">
-            <label for="newClientContactEmail"
-                   class="form-label fw-bold">
-              Email liên hệ nhận hóa đơn
-            </label>
-
-            <input type="email"
-                   class="form-control"
-                   id="newClientContactEmail"
-                   placeholder="ketoan@doanhnghiep.com">
-          </div>
-
-        </div>
-
-        <!-- FOOTER -->
-        <div class="modal-footer">
-
-          <button type="button"
-                  class="btn btn-secondary"
-                  data-bs-dismiss="modal">
-            Đóng
-          </button>
-
-          <button type="submit"
-                  class="btn btn-primary">
-            <i class="fa-solid fa-save me-1"></i>
-            Lưu Khách Hàng
-          </button>
-
-        </div>
-
-      </form>
-
-    </div>
-  </div>
-</div>
-
-  <!-- ================= MODAL: CẬP NHẬT DOANH NGHIỆP & CREDIT LIMIT (TASK-215) ================= -->
-  <div class="modal fade" id="modalEditClient" tabindex="-1">
+  <!-- ================= MODAL: THÊM KHÁCH HÀNG B2B ================= -->
+  <div class="modal fade" id="modalAddClient" tabindex="-1">
     <div class="modal-dialog">
       <div class="modal-content">
-        <div class="modal-header bg-primary text-white">
-          <h5 class="modal-title"><i class="fa-solid fa-pen-to-square me-2"></i>Cập Nhật Doanh Nghiệp & Hạn Mức Nợ</h5>
-          <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+        <div class="modal-header">
+          <h5 class="modal-title"><i class="fa-solid fa-building me-2 text-primary"></i>Thêm Khách Hàng Doanh Nghiệp Mới</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
         </div>
-        <form id="formEditClient" onsubmit="submitEditClient(event)">
-          <input type="hidden" id="editClientId">
+        <form id="formAddClient" onsubmit="submitAddClient(event)">
           <div class="modal-body">
             <div class="mb-3">
               <label class="form-label fw-bold">Tên công ty / Doanh nghiệp (*)</label>
-              <input type="text" class="form-control" id="editClientName" required>
+              <input type="text" class="form-control" id="newClientName" required placeholder="Ví dụ: Công ty Cổ phần Công nghệ ABC">
             </div>
             <div class="row">
               <div class="col-md-6 mb-3">
-                <label class="form-label fw-bold">Mã số thuế</label>
-                <input type="text" class="form-control bg-light" id="editClientTaxCode" readonly>
+                <label class="form-label fw-bold">Mã số thuế (*)</label>
+                <input type="text" class="form-control" id="newClientTaxCode" required placeholder="10 hoặc 13 số">
               </div>
               <div class="col-md-6 mb-3">
                 <label class="form-label fw-bold">Điều khoản thanh toán</label>
-                <select class="form-select" id="editClientNetDays">
+                <select class="form-select" id="newClientNetDays">
                   <option value="15">Net 15 ngày</option>
-                  <option value="30">Net 30 ngày</option>
+                  <option value="30" selected>Net 30 ngày (Tiêu chuẩn)</option>
                   <option value="45">Net 45 ngày</option>
                   <option value="60">Net 60 ngày</option>
                 </select>
               </div>
             </div>
-            <div class="row">
-              <div class="col-md-6 mb-3">
-                <label class="form-label fw-bold text-primary"><i class="fa-solid fa-shield-halved me-1"></i>Hạn Mức Công Nợ (Credit Limit)</label>
-                <input type="number" class="form-control fw-bold border-primary" id="editClientCreditLimit" step="5000000" required>
-              </div>
-              <div class="col-md-6 mb-3">
-                <label class="form-label fw-bold">Trạng thái đối tác</label>
-                <select class="form-select" id="editClientStatus">
-                  <option value="Active">Hoạt động (Active)</option>
-                  <option value="Inactive">Tạm ngưng (Inactive)</option>
-                </select>
-              </div>
-            </div>
             <div class="mb-3">
               <label class="form-label fw-bold">Địa chỉ trụ sở</label>
-              <input type="text" class="form-control" id="editClientAddress">
+              <input type="text" class="form-control" id="newClientAddress" placeholder="Quận / Thành phố...">
             </div>
             <div class="row">
               <div class="col-md-6 mb-3">
                 <label class="form-label fw-bold">Người liên hệ</label>
-                <input type="text" class="form-control" id="editClientContactPerson">
+                <input type="text" class="form-control" id="newClientContactPerson" placeholder="Họ và tên nhân sự">
               </div>
               <div class="col-md-6 mb-3">
                 <label class="form-label fw-bold">Số điện thoại</label>
-                <input type="text" class="form-control" id="editClientContactPhone">
+                <input type="text" class="form-control" id="newClientContactPhone" placeholder="090...">
               </div>
             </div>
             <div class="mb-3">
-              <label class="form-label fw-bold">Email nhận hóa đơn</label>
-              <input type="email" class="form-control" id="editClientContactEmail">
+              <label class="form-label fw-bold">Email liên hệ nhận hóa đơn</label>
+              <input type="email" class="form-control" id="newClientContactEmail" placeholder="ketoan@doanhnghiep.com">
             </div>
           </div>
           <div class="modal-footer">
-            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Hủy</button>
-            <button type="submit" class="btn btn-primary"><i class="fa-solid fa-floppy-disk me-1"></i>Lưu Thay Đổi</button>
+            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Đóng</button>
+            <button type="submit" class="btn btn-primary"><i class="fa-solid fa-save me-1"></i>Lưu Khách Hàng</button>
           </div>
         </form>
       </div>
@@ -765,7 +582,7 @@
 
   <script>
     document.addEventListener('DOMContentLoaded', () => {
-      if (typeof loadClients === 'function') loadClients();
+      if (typeof loadPlacements === 'function') loadPlacements();
     });
   </script>
 </body>
