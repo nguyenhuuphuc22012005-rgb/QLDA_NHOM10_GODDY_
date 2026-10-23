@@ -211,69 +211,173 @@
     </main>
   </div>
 
-  <!-- ================= MODAL: THÊM KHÁCH HÀNG B2B ================= -->
-  <div class="modal fade" id="modalAddClient" tabindex="-1">
-    <div class="modal-dialog">
-      <div class="modal-content">
-        <div class="modal-header">
-          <h5 class="modal-title"><i class="fa-solid fa-building me-2 text-primary"></i>Thêm Khách Hàng Doanh Nghiệp Mới</h5>
-          <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
-        </div>
-        <form id="formAddClient" onsubmit="submitAddClient(event)">
-          <div class="modal-body">
-            <div class="mb-3">
-              <label class="form-label fw-bold">Tên công ty / Doanh nghiệp (*)</label>
-              <input type="text" class="form-control" id="newClientName" required placeholder="Ví dụ: Công ty Cổ phần Công nghệ ABC">
-            </div>
-            <div class="row">
-              <div class="col-md-6 mb-3">
-                <label class="form-label fw-bold">Mã số thuế (*)</label>
-                <input type="text" class="form-control" id="newClientTaxCode" required placeholder="10 hoặc 13 số">
-              </div>
-              <div class="col-md-6 mb-3">
-                <label class="form-label fw-bold">Điều khoản thanh toán</label>
-                <select class="form-select" id="newClientNetDays">
-                  <option value="15">Net 15 ngày</option>
-                  <option value="30" selected>Net 30 ngày (Tiêu chuẩn)</option>
-                  <option value="45">Net 45 ngày</option>
-                  <option value="60">Net 60 ngày</option>
-                </select>
-              </div>
-            </div>
-            <div class="row">
-              <div class="col-md-12 mb-3">
-                <label class="form-label fw-bold">Hạn mức công nợ tối đa (Credit Limit - VNĐ)</label>
-                <input type="number" class="form-control" id="newClientCreditLimit" value="100000000" step="5000000" placeholder="Mặc định: 100,000,000đ">
-                <small class="text-muted">Hệ thống sẽ tự động cảnh báo nếu tổng dư nợ vượt quá hạn mức này.</small>
-              </div>
-            </div>
-            <div class="mb-3">
-              <label class="form-label fw-bold">Địa chỉ trụ sở</label>
-              <input type="text" class="form-control" id="newClientAddress" placeholder="Quận / Thành phố...">
-            </div>
-            <div class="row">
-              <div class="col-md-6 mb-3">
-                <label class="form-label fw-bold">Người liên hệ</label>
-                <input type="text" class="form-control" id="newClientContactPerson" placeholder="Họ và tên nhân sự">
-              </div>
-              <div class="col-md-6 mb-3">
-                <label class="form-label fw-bold">Số điện thoại</label>
-                <input type="text" class="form-control" id="newClientContactPhone" placeholder="090...">
-              </div>
-            </div>
-            <div class="mb-3">
-              <label class="form-label fw-bold">Email liên hệ nhận hóa đơn</label>
-              <input type="email" class="form-control" id="newClientContactEmail" placeholder="ketoan@doanhnghiep.com">
-            </div>
-          </div>
-          <div class="modal-footer">
-            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Đóng</button>
-            <button type="submit" class="btn btn-primary"><i class="fa-solid fa-save me-1"></i>Lưu Khách Hàng</button>
-          </div>
-        </form>
+ <!-- ================= MODAL: THÊM KHÁCH HÀNG B2B - TASK 053 ================= -->
+<div class="modal fade" id="modalAddClient" tabindex="-1"
+     aria-labelledby="modalAddClientLabel" aria-hidden="true">
+
+  <div class="modal-dialog modal-lg modal-dialog-centered">
+
+    <div class="modal-content">
+
+      <!-- HEADER -->
+      <div class="modal-header">
+        <h5 class="modal-title" id="modalAddClientLabel">
+          <i class="fa-solid fa-building me-2 text-primary"></i>
+          Thêm Khách Hàng Doanh Nghiệp Mới
+        </h5>
+
+        <button type="button"
+                class="btn-close"
+                data-bs-dismiss="modal"
+                aria-label="Đóng"></button>
       </div>
+
+      <!-- FORM -->
+      <form id="formAddClient" onsubmit="submitAddClient(event)">
+
+        <div class="modal-body">
+
+          <!-- TÊN DOANH NGHIỆP -->
+          <div class="mb-3">
+            <label for="newClientName" class="form-label fw-bold">
+              Tên công ty / Doanh nghiệp
+              <span class="text-danger">*</span>
+            </label>
+
+            <input type="text"
+                   class="form-control"
+                   id="newClientName"
+                   required
+                   placeholder="Ví dụ: Công ty Cổ phần Công nghệ ABC">
+          </div>
+
+          <!-- MST + ĐIỀU KHOẢN -->
+          <div class="row">
+
+            <div class="col-md-6 mb-3">
+              <label for="newClientTaxCode" class="form-label fw-bold">
+                Mã số thuế
+                <span class="text-danger">*</span>
+              </label>
+
+              <input type="text"
+                     class="form-control"
+                     id="newClientTaxCode"
+                     required
+                     pattern="[0-9]{10}([0-9]{3})?"
+                     title="Mã số thuế gồm 10 hoặc 13 chữ số"
+                     placeholder="10 hoặc 13 số">
+            </div>
+
+            <div class="col-md-6 mb-3">
+              <label for="newClientNetDays" class="form-label fw-bold">
+                Điều khoản thanh toán
+              </label>
+
+              <select class="form-select" id="newClientNetDays">
+                <option value="15">Net 15 ngày</option>
+                <option value="30" selected>
+                  Net 30 ngày (Tiêu chuẩn)
+                </option>
+                <option value="45">Net 45 ngày</option>
+                <option value="60">Net 60 ngày</option>
+              </select>
+            </div>
+
+          </div>
+
+          <!-- CREDIT LIMIT -->
+          <div class="mb-3">
+            <label for="newClientCreditLimit" class="form-label fw-bold">
+              Hạn mức công nợ tối đa (VNĐ)
+            </label>
+
+            <input type="number"
+                   class="form-control"
+                   id="newClientCreditLimit"
+                   min="0"
+                   step="100000"
+                   placeholder="Ví dụ: 50000000">
+          </div>
+
+          <!-- ĐỊA CHỈ -->
+          <div class="mb-3">
+            <label for="newClientAddress" class="form-label fw-bold">
+              Địa chỉ trụ sở
+            </label>
+
+            <input type="text"
+                   class="form-control"
+                   id="newClientAddress"
+                   placeholder="Quận / Thành phố...">
+          </div>
+
+          <!-- NGƯỜI LIÊN HỆ + ĐIỆN THOẠI -->
+          <div class="row">
+
+            <div class="col-md-6 mb-3">
+              <label for="newClientContactPerson"
+                     class="form-label fw-bold">
+                Người liên hệ
+              </label>
+
+              <input type="text"
+                     class="form-control"
+                     id="newClientContactPerson"
+                     placeholder="Họ và tên nhân sự">
+            </div>
+
+            <div class="col-md-6 mb-3">
+              <label for="newClientContactPhone"
+                     class="form-label fw-bold">
+                Số điện thoại
+              </label>
+
+              <input type="tel"
+                     class="form-control"
+                     id="newClientContactPhone"
+                     placeholder="090...">
+            </div>
+
+          </div>
+
+          <!-- EMAIL -->
+          <div class="mb-3">
+            <label for="newClientContactEmail"
+                   class="form-label fw-bold">
+              Email liên hệ nhận hóa đơn
+            </label>
+
+            <input type="email"
+                   class="form-control"
+                   id="newClientContactEmail"
+                   placeholder="ketoan@doanhnghiep.com">
+          </div>
+
+        </div>
+
+        <!-- FOOTER -->
+        <div class="modal-footer">
+
+          <button type="button"
+                  class="btn btn-secondary"
+                  data-bs-dismiss="modal">
+            Đóng
+          </button>
+
+          <button type="submit"
+                  class="btn btn-primary">
+            <i class="fa-solid fa-save me-1"></i>
+            Lưu Khách Hàng
+          </button>
+
+        </div>
+
+      </form>
+
     </div>
   </div>
+</div>
 
   <!-- ================= MODAL: CẬP NHẬT DOANH NGHIỆP & CREDIT LIMIT (TASK-215) ================= -->
   <div class="modal fade" id="modalEditClient" tabindex="-1">
