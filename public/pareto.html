@@ -1,0 +1,294 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Biểu Đồ Pareto & Quản Lý Chất Lượng - GODDY RECRUIT</title>
+  
+  <!-- Google Fonts: Inter -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+  
+  <!-- Bootstrap 5 CSS -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+  
+  <!-- Font Awesome 6 Icons -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+  
+  <!-- Chart.js -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+  <!-- Custom Modular CSS -->
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+  <!-- SIDEBAR -->
+  <aside class="sidebar">
+    <div class="sidebar-header">
+      <div class="sidebar-logo-icon" id="sidebarLogoIcon"><i class="fa-solid fa-chart-pie"></i></div>
+      <div>
+        <div class="sidebar-title" id="sidebarMainTitle">GODDY RECRUIT</div>
+        <div class="sidebar-subtitle" id="sidebarSubTitle">Quản Lý Công Nợ B2B</div>
+      </div>
+    </div>
+
+    <!-- Menu Nội bộ (Admin, Kế toán, Recruiter) -->
+    <ul class="sidebar-menu" id="sidebarMenuInternal">
+      <li class="sidebar-item" onclick="switchTab('dashboard')">
+        <i class="fa-solid fa-gauge-high"></i> Dashboard Thống Kê
+      </li>
+      <li class="sidebar-item" onclick="switchTab('clients')">
+        <i class="fa-solid fa-building-user"></i> Khách Hàng Doanh Nghiệp
+      </li>
+      <li class="sidebar-item" onclick="switchTab('recruitment')">
+        <i class="fa-solid fa-briefcase"></i> Tuyển Dụng & Deal Onboard
+      </li>
+      <li class="sidebar-item" onclick="switchTab('invoices')">
+        <i class="fa-solid fa-file-invoice-dollar"></i> Hóa Đơn & Invoicing
+      </li>
+      <li class="sidebar-item" onclick="switchTab('debt')">
+        <i class="fa-solid fa-scale-unbalanced"></i> Công Nợ & Tuổi Nợ (Aging)
+      </li>
+      <li class="sidebar-item" onclick="switchTab('audit')">
+        <i class="fa-solid fa-clock-rotate-left"></i> Nhật Ký Audit Log
+      </li>
+      <li class="sidebar-item active" onclick="switchTab('pareto')">
+        <i class="fa-solid fa-chart-simple"></i> Phân Tích Pareto (Chất Lượng)
+      </li>
+    </ul>
+
+    <div class="sidebar-footer" id="sidebarFooter">
+      <div id="sidebarFooterInternal">
+        <div><strong>Đồ án QLDA - Nhóm 10</strong></div>
+        <div class="text-muted" style="font-size: 11px;">Phiên bản 1.0.0 (PMBOK Quality)</div>
+      </div>
+    </div>
+  </aside>
+
+  <!-- MAIN WRAPPER -->
+  <div class="main-wrapper">
+    <header class="top-navbar">
+      <h1 class="page-title" id="pageHeaderTitle">
+        <i class="fa-solid fa-chart-simple text-primary me-2"></i>Phân Tích Pareto & Quản Lý Chất Lượng Dự Án
+      </h1>
+      <div class="d-flex align-items-center gap-2">
+        <a href="/MSSV_HoTen_Pareto.xlsx" download class="btn btn-sm btn-success fw-semibold shadow-sm">
+          <i class="fa-solid fa-file-excel me-1"></i> Tải File Excel Nộp Bài (.xlsx)
+        </a>
+        <button class="btn btn-sm btn-outline-secondary" onclick="reloadParetoData()" title="Làm mới">
+          <i class="fa-solid fa-rotate me-1"></i> Làm mới
+        </button>
+      </div>
+    </header>
+
+    <main class="content-container">
+      
+      <!-- Bộ Chuyển Đổi Tab Chế Độ: Dự Án GODDY vs Bài Thực Hành Cá Nhân -->
+      <div class="d-flex flex-wrap align-items-center justify-content-between mb-4 gap-3 bg-white p-3 rounded-3 border shadow-sm">
+        <div class="btn-group" role="group">
+          <button type="button" class="btn btn-primary fw-semibold px-4" id="btnModeProject" onclick="setParetoMode('project')">
+            <i class="fa-solid fa-diagram-project me-2"></i>1. Dự Án GODDY Recruit (Nhóm 10)
+          </button>
+          <button type="button" class="btn btn-outline-primary fw-semibold px-4" id="btnModePractice" onclick="setParetoMode('practice')">
+            <i class="fa-solid fa-user-pen me-2"></i>2. Bài Thực Hành Cá Nhân (100 Lỗi)
+          </button>
+        </div>
+
+        <div class="d-flex align-items-center gap-2 text-muted small">
+          <span class="badge bg-primary-subtle text-primary border border-primary-subtle px-2 py-1">Quy tắc 80/20</span>
+          <span>Phân định <strong>Vital Few</strong> (Ưu tiên hàng đầu) & <strong>Trivial Many</strong> (Thứ yếu)</span>
+        </div>
+      </div>
+
+      <!-- 4 Metric Cards -->
+      <div class="row g-3 mb-4">
+        <div class="col-md-3">
+          <div class="metric-card">
+            <div>
+              <div class="metric-title">Tổng Báo Cáo Lỗi</div>
+              <div class="metric-value text-primary" id="kpiTotalErrors">120 Lỗi</div>
+            </div>
+            <div class="metric-icon-box bg-primary-subtle text-primary">
+              <i class="fa-solid fa-bug"></i>
+            </div>
+          </div>
+        </div>
+        <div class="col-md-3">
+          <div class="metric-card">
+            <div>
+              <div class="metric-title">Nhóm "Vital Few"</div>
+              <div class="metric-value text-danger" id="kpiVitalFewCount">3 Nhóm</div>
+            </div>
+            <div class="metric-icon-box bg-danger-subtle text-danger">
+              <i class="fa-solid fa-fire"></i>
+            </div>
+          </div>
+        </div>
+        <div class="col-md-3">
+          <div class="metric-card">
+            <div>
+              <div class="metric-title">Tỷ Lệ Lỗi Tích Lũy</div>
+              <div class="metric-value text-success" id="kpiVitalCumRate">81.7%</div>
+            </div>
+            <div class="metric-icon-box bg-success-subtle text-success">
+              <i class="fa-solid fa-chart-line"></i>
+            </div>
+          </div>
+        </div>
+        <div class="col-md-3">
+          <div class="metric-card">
+            <div>
+              <div class="metric-title">Cảnh Báo Lỗi An Ninh</div>
+              <div class="metric-value text-warning" id="kpiSecurityNotice">P1 (Hotfix Ngay)</div>
+            </div>
+            <div class="metric-icon-box bg-warning-subtle text-warning">
+              <i class="fa-solid fa-shield-halved"></i>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Khung Biểu Đồ Pareto -->
+      <div class="table-box mb-4">
+        <div class="box-header d-flex justify-content-between align-items-center">
+          <div>
+            <h3 class="box-title" id="paretoChartTitle">
+              <i class="fa-solid fa-chart-column text-primary me-2"></i>Biểu Đồ Pareto (Pareto Diagram)
+            </h3>
+            <div class="text-muted small mt-1" id="paretoChartSubtitle">
+              Phân tích số lượng lỗi (trục trái), đường tỷ lệ tích lũy (trục phải) và mốc giới hạn 80% (80% Line)
+            </div>
+          </div>
+          <div class="d-flex gap-2">
+            <button class="btn btn-sm btn-outline-primary" onclick="viewSlideImage()">
+              <i class="fa-solid fa-image me-1"></i> Xem Ảnh Slide PowerPoint
+            </button>
+          </div>
+        </div>
+
+        <div style="position: relative; height: 380px; width: 100%;">
+          <canvas id="paretoCanvas"></canvas>
+        </div>
+      </div>
+
+      <!-- Bảng Số Liệu Chi Tiết -->
+      <div class="table-box mb-4">
+        <div class="box-header d-flex justify-content-between align-items-center">
+          <div>
+            <h3 class="box-title"><i class="fa-solid fa-table-list text-primary me-2"></i>Bảng Dữ Liệu Báo Cáo Lỗi & Tỷ Lệ Lũy Kế</h3>
+            <div class="text-muted small mt-1">Đã sắp xếp giảm dần theo số lượng báo cáo lỗi (Frequency)</div>
+          </div>
+          <a href="/MSSV_HoTen_Pareto.xlsx" download class="btn btn-sm btn-outline-success">
+            <i class="fa-solid fa-file-excel me-1"></i> Xuất Bảng Ra Excel (.xlsx)
+          </a>
+        </div>
+        <div class="table-responsive">
+          <table class="table table-hover align-middle">
+            <thead class="table-light">
+              <tr>
+                <th class="text-center" style="width: 60px;">STT</th>
+                <th class="text-center" style="width: 90px;">Mã Lỗi</th>
+                <th>Tên Nhóm Lỗi / Vấn Đề</th>
+                <th class="text-end" style="width: 130px;">Số Báo Cáo</th>
+                <th class="text-end" style="width: 120px;">Tỷ Lệ (%)</th>
+                <th class="text-end" style="width: 130px;">Lũy Kế (%)</th>
+                <th class="text-center" style="width: 220px;">Phân Loại Pareto</th>
+              </tr>
+            </thead>
+            <tbody id="paretoTableBody"></tbody>
+            <tfoot class="table-light fw-bold" id="paretoTableFoot"></tfoot>
+          </table>
+        </div>
+      </div>
+
+      <!-- Khối Trả Lời 3 Câu Hỏi Kết Luận (Dành riêng cho Bài Thực Hành Cá Nhân) -->
+      <div class="card border-0 shadow-sm mb-4" id="sectionAnswers">
+        <div class="card-header bg-primary text-white py-3">
+          <h5 class="mb-0 fw-bold"><i class="fa-solid fa-clipboard-check me-2"></i>KẾT LUẬN & GIẢI ĐÁP 3 CÂU HỎI THỰC HÀNH CÁ NHÂN (15 PHÚT)</h5>
+        </div>
+        <div class="card-body p-4 bg-light">
+          
+          <div class="mb-4 bg-white p-3 rounded-3 border">
+            <h6 class="fw-bold text-primary mb-2">
+              <i class="fa-solid fa-circle-question me-1"></i> Câu 1: Cần tối thiểu bao nhiêu nhóm lỗi đầu tiên để đạt ít nhất 80%? Ghi mã lỗi và tỷ lệ lũy kế.
+            </h6>
+            <div class="ps-3 border-start border-3 border-primary text-dark">
+              <p class="mb-1"><strong>Trả lời:</strong> Cần tối thiểu <strong>4 nhóm lỗi</strong> đầu tiên để đạt đúng ngưỡng <strong>80.0%</strong> tổng số lỗi báo cáo.</p>
+              <ul class="mb-0 ps-3">
+                <li><strong>L02</strong> (Đặt hàng không thành công): 28 báo cáo | Tỷ lệ: 28.0% | Lũy kế: <strong>28.0%</strong></li>
+                <li><strong>L06</strong> (Giỏ hàng tính sai tổng tiền): 22 báo cáo | Tỷ lệ: 22.0% | Lũy kế: <strong>50.0%</strong></li>
+                <li><strong>L04</strong> (Tìm kiếm và lọc không chính xác): 16 báo cáo | Tỷ lệ: 16.0% | Lũy kế: <strong>66.0%</strong></li>
+                <li><strong>L01</strong> (Cấu hình máy tính sai hoặc thiếu): 14 báo cáo | Tỷ lệ: 14.0% | Lũy kế: <strong>80.0%</strong> (Đạt ngưỡng 80%)</li>
+              </ul>
+            </div>
+          </div>
+
+          <div class="mb-4 bg-white p-3 rounded-3 border">
+            <h6 class="fw-bold text-primary mb-2">
+              <i class="fa-solid fa-circle-question me-1"></i> Câu 2: Các nhóm được chọn chiếm bao nhiêu phần trăm trong 8 nhóm? Dữ liệu có đúng tỷ lệ 80–20 không?
+            </h6>
+            <div class="ps-3 border-start border-3 border-primary text-dark">
+              <p class="mb-1"><strong>Trả lời:</strong></p>
+              <ul class="mb-1 ps-3">
+                <li>Tỷ lệ 4 nhóm được chọn trong tổng số nhóm lỗi: <strong>4 / 8 nhóm = 50.0%</strong>.</li>
+                <li><strong>Nhận xét tỷ lệ 80–20:</strong> Tỷ lệ thực tế ở đây là <strong>80–50</strong> (50% nhóm nguyên nhân gây ra 80% tổng số báo cáo lỗi), <em>chưa khớp hoàn toàn với tỷ lệ lý thuyết kinh điển 80–20</em> (theo lý thuyết thì 20% tương ứng khoảng 1.6 ~ 2 nhóm lỗi).</li>
+                <li><strong>Giá trị thực tiễn:</strong> Dữ liệu vẫn tuân thủ hoàn hảo <strong>Nguyên lý Pareto</strong>: Giúp đội ngũ dự án phân định rành mạch nhóm <strong>"Vital Few"</strong> (4 nhóm lỗi cốt lõi liên quan trực tiếp đến đặt hàng, tính tiền giỏ hàng, tìm kiếm và cấu hình) để ưu tiên dồn lực xử lý trong tuần 5, thay vì phân tán nguồn lực sửa các lỗi râu ria.</li>
+              </ul>
+            </div>
+          </div>
+
+          <div class="bg-white p-3 rounded-3 border">
+            <h6 class="fw-bold text-danger mb-2">
+              <i class="fa-solid fa-triangle-exclamation me-1"></i> Câu 3: L05 là lỗi phân quyền nghiêm trọng. Có nên trì hoãn xử lý vì ít báo cáo không? Giải thích ngắn gọn.
+            </h6>
+            <div class="ps-3 border-start border-3 border-danger text-dark">
+              <p class="mb-1 text-danger fw-bold"><i class="fa-solid fa-ban me-1"></i> KHÔNG ĐƯỢC PHÉP TRÌ HOÃN! BẮT BUỘC PHẢI XỬ LÝ KHẨN CẤP NGAY LẬP TỨC (Mức độ Critical / Hotfix P1).</p>
+              <p class="mb-1"><strong>Giải thích ngắn gọn:</strong></p>
+              <ol class="mb-0 ps-3">
+                <li><strong>Hạn chế của Biểu đồ Pareto:</strong> Sơ đồ Pareto chỉ xếp hạng theo <em>Tần suất xuất hiện (Count/Frequency)</em> chứ không phản ánh <em>Mức độ nghiêm trọng & Tác động an ninh (Severity/Impact)</em>.</li>
+                <li><strong>Bản chất nguy hiểm của lỗi L05:</strong> "Xem được đơn hàng của người khác" là lỗ hổng an ninh phân quyền đối tượng trực tiếp (<strong>IDOR - Broken Object Level Authorization</strong> theo OWASP Top 10). Lỗ hổng này làm rò rỉ dữ liệu riêng tư khách hàng (PII), vi phạm pháp luật bảo vệ bí mật thông tin, có thể khiến website bị hacker khai thác hàng loạt và hủy hoại uy tín thương hiệu.</li>
+                <li><strong>Chiến lược Quản lý chất lượng & Rủi ro PMBOK:</strong> Đội ngũ dự án phải phối hợp biểu đồ Pareto với <strong>Ma trận Mức độ rủi ro (Risk Matrix)</strong>. Nhóm Vital Few (L02, L06, L04, L01) được đưa vào kế hoạch Sprint Tuần 5, còn lỗi L05 phải được chỉ định <strong>Bản vá nóng khẩn cấp (Emergency Hotfix)</strong> xử lý ngay trong ngày!</li>
+              </ol>
+            </div>
+          </div>
+
+        </div>
+      </div>
+
+    </main>
+  </div>
+
+  <!-- Modal Xem Ảnh Slide Chuẩn -->
+  <div class="modal fade" id="modalSlideView" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-xl modal-dialog-centered">
+      <div class="modal-content border-0 shadow-lg">
+        <div class="modal-header bg-dark text-white">
+          <h5 class="modal-title"><i class="fa-solid fa-image me-2"></i>Ảnh Sơ Đồ Pareto Chuẩn (Khớp 100% Slide Bài Giảng)</h5>
+          <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body text-center p-3">
+          <img id="slideModalImage" src="/images/pareto_du_an_goddy.png" class="img-fluid rounded shadow" alt="Sơ đồ Pareto">
+        </div>
+        <div class="modal-footer d-flex justify-content-between">
+          <span class="text-muted small">Nhóm 10 - Quản lý dự án CNTT (GODDY Recruit)</span>
+          <div>
+            <a id="btnDownloadImage" href="/images/pareto_du_an_goddy.png" download class="btn btn-primary btn-sm">
+              <i class="fa-solid fa-download me-1"></i> Tải Ảnh Độ Phân Giải Cao
+            </a>
+            <button type="button" class="btn btn-secondary btn-sm" data-bs-dismiss="modal">Đóng</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Bootstrap 5 JS Bundle -->
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+  <!-- Global Common JS -->
+  <script src="js/common.js"></script>
+  <!-- Pareto Logic JS -->
+  <script src="js/pareto.js"></script>
+</body>
+</html>

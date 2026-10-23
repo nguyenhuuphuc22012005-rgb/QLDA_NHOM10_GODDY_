@@ -34,13 +34,35 @@ async function runPlacementInvoiceRelationTests() {
   // 1. Khởi tạo đối tượng Placement mẫu
   await test('1. Tạo bản ghi Deal Placement chuẩn bị kiểm thử quan hệ', async () => {
     client = await Client.findOne();
+    if (!client) {
+      client = await Client.create({
+        companyName: 'FPT Software Test Rel',
+        taxCode: '0101778163_TEST_REL',
+        paymentTermDays: 30
+      });
+    }
+
     job = await Job.findOne();
+    if (!job) {
+      job = await Job.create({
+        clientId: client.id,
+        title: 'Backend Engineer Test Rel',
+        feeRatePercent: 18.0
+      });
+    }
+
     candidate = await Candidate.findOne();
+    if (!candidate) {
+      candidate = await Candidate.create({
+        fullName: 'Nguyễn Văn Test Rel',
+        email: 'test_rel@goddy.vn'
+      });
+    }
 
     placement = await Placement.create({
-      jobId: job ? job.id : 1,
-      candidateId: candidate ? candidate.id : 1,
-      clientId: client ? client.id : 1,
+      jobId: job.id,
+      candidateId: candidate.id,
+      clientId: client.id,
       recruiterId: 1,
       officialSalary: 40000000,
       serviceFee: 86400000, // 40tr * 12 * 18%
