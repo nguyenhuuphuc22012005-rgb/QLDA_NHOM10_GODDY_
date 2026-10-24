@@ -2,6 +2,7 @@
  * Module: Quản lý Công nợ & Báo cáo Tuổi nợ
  * Task 116: Bảng chi tiết công nợ và phân loại tuổi nợ.
  * Task 117: Modal thu tiền, hiển thị dư nợ và kiểm tra số tiền thanh toán.
+ * Task 118: Nút nhắc nợ từng dòng và Toast thông báo.
  */
 
 function getDebtOverdueDays(item) {
@@ -66,6 +67,69 @@ function escapeDebtValue(value) {
     '"': '&quot;',
     "'": '&#39;'
   })[char]);
+}
+
+/**
+ * Task 118: Hiển thị Bootstrap Toast.
+ * type: success, danger, warning, info
+ */
+function showDebtToast(message, type = 'success') {
+  let container = document.getElementById('debtToastContainer');
+
+  if (!container) {
+    container = document.createElement('div');
+    container.id = 'debtToastContainer';
+    container.className = 'toast-container position-fixed top-0 end-0 p-3';
+    container.style.zIndex = '1090';
+    container.setAttribute('aria-live', 'polite');
+    container.setAttribute('aria-atomic', 'true');
+    document.body.appendChild(container);
+  }
+
+  if (typeof bootstrap === 'undefined' || !bootstrap.Toast) {
+    console.warn('Bootstrap Toast chưa sẵn sàng:', message);
+    alert(message);
+    return;
+  }
+
+  const allowedTypes = ['success', 'danger', 'warning', 'info'];
+  const toastType = allowedTypes.includes(type) ? type : 'info';
+
+  const toast = document.createElement('div');
+  toast.className = `toast align-items-center text-bg-${toastType} border-0`;
+  toast.setAttribute('role', 'status');
+  toast.setAttribute('aria-live', 'polite');
+  toast.setAttribute('aria-atomic', 'true');
+
+  const content = document.createElement('div');
+  content.className = 'd-flex';
+
+  const body = document.createElement('div');
+  body.className = 'toast-body';
+  body.textContent = String(message || '');
+
+  const closeButton = document.createElement('button');
+  closeButton.type = 'button';
+  closeButton.className = 'btn-close btn-close-white me-2 m-auto';
+  closeButton.setAttribute('data-bs-dismiss', 'toast');
+  closeButton.setAttribute('aria-label', 'Đóng');
+
+  content.appendChild(body);
+  content.appendChild(closeButton);
+  toast.appendChild(content);
+  container.appendChild(toast);
+
+  const toastInstance = bootstrap.Toast.getOrCreateInstance(toast, {
+    autohide: true,
+    delay: 3500
+  });
+
+  toast.addEventListener('hidden.bs.toast', () => {
+    toastInstance.dispose();
+    toast.remove();
+  });
+
+  toastInstance.show();
 }
 
 async function loadDebt() {
@@ -153,8 +217,8 @@ async function loadDebt() {
         openRecordPayment(invoiceId, invoiceCode, amount);
       });
 
-      row.querySelector('[data-action="reminder"]').addEventListener('click', () => {
-        sendDebtReminder(invoiceId);
+      row.querySelector('[data-action="reminder"]').addEventListener('click', event => {
+        sendDebtReminder(invoiceId, event.currentTarget, invoiceCode);
       });
 
       tbody.appendChild(row);
@@ -183,7 +247,7 @@ function openRecordPayment(invId, invCode, remaining) {
   const remainingAmount = Number(remaining);
 
   if (!Number.isFinite(remainingAmount) || remainingAmount <= 0) {
-    alert('Số nợ còn lại không hợp lệ hoặc hóa đơn đã được thanh toán.');
+    showDebtToast('Số nợ còn lại không hợp lệ hoặc hóa đơn đã được thanh toán.', 'warning');
     return;
   }
 
@@ -208,7 +272,7 @@ function openRecordPayment(invId, invCode, remaining) {
   if (modalEl && typeof bootstrap !== 'undefined') {
     bootstrap.Modal.getOrCreateInstance(modalEl).show();
   } else {
-    alert('Không tìm thấy hộp thoại thu tiền hoặc Bootstrap.');
+    showDebtToast('Không tìm thấy hộp thoại thu tiền hoặc Bootstrap.', 'danger');
   }
 }
 
@@ -223,7 +287,7 @@ async function submitRecordPayment(e) {
   const errorEl = document.getElementById('payAmountError');
 
   if (!amountEl) {
-    alert('Không tìm thấy ô nhập số tiền thanh toán.');
+    showDebtToast('Không tìm thấy ô nhập số tiền thanh toán.', 'danger');
     return;
   }
 
@@ -263,7 +327,15 @@ async function submitRecordPayment(e) {
     '#formRecordPayment button[type="submit"]'
   );
 
-  if (submitButton) submitButton.disabled = true;
+  if (submitButton?.disabled) return;
+
+  const originalButtonHtml = submitButton?.innerHTML;
+
+  if (submitButton) {
+    submitButton.disabled = true;
+    submitButton.innerHTML =
+      '<span class="spinner-border spinner-border-sm me-1" aria-hidden="true"></span>Đang xử lý...';
+  }
 
   try {
     const res = await fetch('/api/debt/payment', {
@@ -272,10 +344,10 @@ async function submitRecordPayment(e) {
       body: JSON.stringify(body)
     });
 
-    const data = await res.json();
+    const data = await res.json().catch(() => ({}));
 
     if (!res.ok || !data.success) {
-      alert(data.message || 'Không thể ghi nhận thanh toán.');
+      showDebtToast(data.message || 'Không thể ghi nhận thanh toán.', 'danger');
       return;
     }
 
@@ -285,17 +357,38 @@ async function submitRecordPayment(e) {
       bootstrap.Modal.getInstance(modalEl)?.hide();
     }
 
-    alert('Ghi nhận thanh toán thành công!');
+    showDebtToast(data.message || 'Ghi nhận thanh toán thành công!', 'success');
     await loadDebt();
   } catch (err) {
     console.error('Lỗi ghi nhận thanh toán:', err);
-    alert('Lỗi kết nối máy chủ khi ghi nhận thanh toán.');
+    showDebtToast('Lỗi kết nối máy chủ khi ghi nhận thanh toán.', 'danger');
   } finally {
-    if (submitButton) submitButton.disabled = false;
+    if (submitButton) {
+      submitButton.disabled = false;
+      submitButton.innerHTML = originalButtonHtml;
+    }
   }
 }
 
-async function sendDebtReminder(invoiceId) {
+/**
+ * Task 118: Gửi nhắc nợ với Toast và trạng thái đang xử lý.
+ */
+async function sendDebtReminder(invoiceId, button = null, invoiceCode = '') {
+  if (button?.disabled) return;
+
+  if (!invoiceId) {
+    showDebtToast('Không xác định được hóa đơn cần nhắc nợ.', 'danger');
+    return;
+  }
+
+  const originalButtonHtml = button?.innerHTML;
+
+  if (button) {
+    button.disabled = true;
+    button.innerHTML =
+      '<span class="spinner-border spinner-border-sm me-1" role="status" aria-hidden="true"></span>Đang gửi...';
+  }
+
   try {
     const res = await fetch('/api/debt/remind', {
       method: 'POST',
@@ -303,17 +396,28 @@ async function sendDebtReminder(invoiceId) {
       body: JSON.stringify({ invoiceId })
     });
 
-    const data = await res.json();
+    const data = await res.json().catch(() => ({}));
 
-    if (!res.ok) {
-      alert(data.message || 'Lỗi gửi nhắc nợ!');
+    if (!res.ok || data.success === false) {
+      showDebtToast(
+        data.message || `Không thể gửi nhắc nợ${invoiceCode ? ` cho ${invoiceCode}` : ''}.`,
+        'danger'
+      );
       return;
     }
 
-    alert(data.message || 'Đã gửi lời nhắc nợ thành công!');
+    showDebtToast(
+      data.message || `Đã gửi lời nhắc nợ${invoiceCode ? ` cho ${invoiceCode}` : ''} thành công!`,
+      'success'
+    );
   } catch (err) {
     console.error('Lỗi gửi nhắc nợ:', err);
-    alert('Lỗi kết nối khi gửi nhắc nợ!');
+    showDebtToast('Lỗi kết nối khi gửi nhắc nợ. Vui lòng thử lại.', 'danger');
+  } finally {
+    if (button) {
+      button.disabled = false;
+      button.innerHTML = originalButtonHtml;
+    }
   }
 }
 
@@ -365,8 +469,9 @@ async function exportDebtCSV() {
     link.remove();
 
     URL.revokeObjectURL(url);
+    showDebtToast('Đã xuất báo cáo công nợ CSV thành công.', 'success');
   } catch (err) {
     console.error('Lỗi xuất CSV:', err);
-    alert('Lỗi xuất CSV!');
+    showDebtToast('Lỗi xuất CSV!', 'danger');
   }
 }
