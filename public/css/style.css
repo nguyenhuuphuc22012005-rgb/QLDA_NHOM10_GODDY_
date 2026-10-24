@@ -566,3 +566,10 @@
     /* Không ép toàn bộ hóa đơn thành một trang nếu nội dung quá dài.
        Trình duyệt được phép phân trang tự nhiên trên giấy A4. */
 }
+/* SCRUM-174 Task115: Debt aging colors */
+.text-orange {
+    color: #fd7e14 !important;
+}
+.border-orange {
+    border-color: #fd7e14 !important;
+}
