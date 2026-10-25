@@ -1,3 +1,4 @@
+
 /**
  * Module: Dashboard & Thống Kê KPI
  */
@@ -7,53 +8,150 @@ async function loadDashboard() {
     const period = periodSelect ? periodSelect.value : 'all';
     const res = await fetch(`/api/dashboard/stats?period=${period}`);
     const data = await res.json();
+
     if (data.success) {
       const vRevenue = document.getElementById('valTotalRevenue');
       if (vRevenue) vRevenue.textContent = formatMoney(data.stats.totalRevenue);
+
       const vAR = document.getElementById('valTotalAR');
       if (vAR) vAR.textContent = formatMoney(data.stats.totalAR);
+
       const vOverdue = document.getElementById('valOverdueAR');
       if (vOverdue) vOverdue.textContent = formatMoney(data.stats.overdueAR);
+
       const vPlacement = document.getElementById('valPlacementCount');
       if (vPlacement) vPlacement.textContent = data.stats.placementCount + ' Deals';
+
       const vColRate = document.getElementById('valCollectionRate');
       if (vColRate) vColRate.textContent = data.stats.collectionRate + '%';
-      updateDebtProgress('collectionProgressBar', 'collectionProgressTrack', data.stats.collectionRate);
+
+      updateDebtProgress(
+        'collectionProgressBar',
+        'collectionProgressTrack',
+        data.stats.collectionRate
+      );
+
       const vBadDebt = document.getElementById('valBadDebtRate');
       if (vBadDebt) vBadDebt.textContent = data.stats.badDebtRate + '%';
-      updateDebtProgress('badDebtProgressBar', 'badDebtProgressTrack', data.stats.badDebtRate);
+
+      updateDebtProgress(
+        'badDebtProgressBar',
+        'badDebtProgressTrack',
+        data.stats.badDebtRate
+      );
 
       if (data.chartData) {
         initCharts(data.chartData);
       }
 
-      // Render Top 5 Debtors
+      // TASK-150: Top 5 debtors by outstanding amount
       const tbody = document.getElementById('topDebtorsTableBody');
+
       if (tbody) {
-        tbody.innerHTML = '';
-        if (data.topDebtors && data.topDebtors.length > 0) {
-          data.topDebtors.forEach(td => {
-            tbody.innerHTML += `
-              <tr>
-                <td><strong>${td.companyName}</strong></td>
-                <td><code>${td.taxCode}</code></td>
-                <td><span class="badge bg-secondary">${td.invoiceCount} hóa đơn</span></td>
-                <td class="text-danger fw-bold">${formatMoney(td.totalRemaining)}</td>
-                <td>
-                  <button class="btn btn-sm btn-outline-primary" onclick="switchTab('debt')">
-                    <i class="fa-solid fa-eye me-1"></i>Xem Chi Tiết
-                  </button>
-                </td>
-              </tr>
-            `;
-          });
-        } else {
-          tbody.innerHTML = '<tr><td colspan="5" class="text-center text-muted py-3">Hiện không có công nợ tồn đọng!</td></tr>';
+        tbody.replaceChildren();
+
+        const debtors = Array.isArray(data.topDebtors)
+          ? [...data.topDebtors]
+              .sort((a, b) =>
+                (Number(b.totalRemaining) || 0) -
+                (Number(a.totalRemaining) || 0)
+              )
+              .slice(0, 5)
+          : [];
+
+        if (debtors.length === 0) {
+          const row = tbody.insertRow();
+          const cell = row.insertCell();
+
+          cell.colSpan = 5;
+          cell.className = 'text-center text-muted py-3';
+          cell.textContent = 'Hiện không có công nợ tồn đọng!';
         }
+
+        debtors.forEach((td, index) => {
+          const row = tbody.insertRow();
+
+          const name = String(td.companyName || '-');
+          const taxCode = String(td.taxCode || '');
+          const invoiceCount = Number(td.invoiceCount) || 0;
+          const amount = Number(td.totalRemaining) || 0;
+
+          // Company name
+          const nameCell = row.insertCell();
+          const strong = document.createElement('strong');
+          strong.textContent = `${index + 1}. ${name}`;
+          nameCell.appendChild(strong);
+
+          // Tax code
+          const taxCell = row.insertCell();
+          const code = document.createElement('code');
+          code.textContent = taxCode || '-';
+          taxCell.appendChild(code);
+
+          // Outstanding invoice count
+          const countCell = row.insertCell();
+          const badge = document.createElement('span');
+          badge.className = 'badge bg-secondary';
+          badge.textContent = `${invoiceCount} hóa đơn`;
+          countCell.appendChild(badge);
+
+          // Outstanding amount
+          const amountCell = row.insertCell();
+          amountCell.className = 'text-danger fw-bold';
+          amountCell.textContent = formatMoney(amount);
+
+          // Quick details button
+          const actionCell = row.insertCell();
+          const button = document.createElement('button');
+
+          button.type = 'button';
+          button.className = 'btn btn-sm btn-outline-primary';
+          button.setAttribute('aria-label', `Xem công nợ của ${name}`);
+
+          const icon = document.createElement('i');
+          icon.className = 'fa-solid fa-eye me-1';
+
+          button.appendChild(icon);
+          button.appendChild(document.createTextNode('Xem chi tiết'));
+
+          button.addEventListener('click', () => {
+            openTopDebtorDetails(name, taxCode);
+          });
+
+          actionCell.appendChild(button);
+        });
       }
     }
   } catch (err) {
     console.error('Lỗi tải Dashboard:', err);
+  }
+}
+
+/**
+ * TASK-150: Open debt report for selected debtor.
+ *
+ * Note: debt.js needs to use window.task150DebtorFilter
+ * to filter the corresponding invoice list.
+ */
+function openTopDebtorDetails(companyName, taxCode) {
+  if (typeof switchTab !== 'function') return;
+
+  switchTab('debt');
+
+  const section = document.getElementById('section-debt');
+
+  // Do not load debt details if the user cannot access this tab.
+  if (!section || section.style.display === 'none') {
+    return;
+  }
+
+  window.task150DebtorFilter = {
+    companyName: String(companyName || ''),
+    taxCode: String(taxCode || '')
+  };
+
+  if (typeof loadDebt === 'function') {
+    loadDebt();
   }
 }
 
@@ -62,6 +160,7 @@ function initCharts(chartData) {
     revenueChartInstance.destroy();
     revenueChartInstance = null;
   }
+
   if (industryChartInstance) {
     industryChartInstance.destroy();
     industryChartInstance = null;
@@ -133,7 +232,9 @@ function initCharts(chartData) {
             displayColors: false,
             callbacks: {
               label: context =>
-                'Doanh thu: ' + formatRevenue(context.parsed.y) + ' triệu VNĐ'
+                'Doanh thu: ' +
+                formatRevenue(context.parsed.y) +
+                ' triệu VNĐ'
             }
           }
         },
@@ -156,6 +257,7 @@ function initCharts(chartData) {
       }
     });
   }
+
   // TASK-149: Partner industry composition doughnut chart
   const canvasInd = document.getElementById('industryChart');
 
@@ -175,11 +277,20 @@ function initCharts(chartData) {
       : [];
 
     const colors = [
-      '#4f46e5', '#10b981', '#f59e0b', '#ec4899',
-      '#64748b', '#06b6d4', '#8b5cf6', '#f97316'
+      '#4f46e5',
+      '#10b981',
+      '#f59e0b',
+      '#ec4899',
+      '#64748b',
+      '#06b6d4',
+      '#8b5cf6',
+      '#f97316'
     ];
 
-    const totalPartners = values.reduce((sum, value) => sum + value, 0);
+    const totalPartners = values.reduce(
+      (sum, value) => sum + value,
+      0
+    );
 
     industryChartInstance = new Chart(ctxInd, {
       type: 'doughnut',
@@ -188,7 +299,9 @@ function initCharts(chartData) {
         datasets: [{
           label: 'Đối tác',
           data: values,
-          backgroundColor: labels.map((_, index) => colors[index % colors.length]),
+          backgroundColor: labels.map(
+            (_, index) => colors[index % colors.length]
+          ),
           borderColor: '#ffffff',
           borderWidth: 3,
           hoverBorderWidth: 4,
@@ -225,13 +338,16 @@ function initCharts(chartData) {
             callbacks: {
               label: context => {
                 const value = Number(context.parsed) || 0;
+
                 const percent = totalPartners > 0
                   ? (value / totalPartners * 100).toFixed(1)
                   : '0.0';
 
                 return ' ' + context.label + ': ' +
                   new Intl.NumberFormat('vi-VN').format(value) +
-                  ' đối tác (' + percent.replace('.', ',') + '%)';
+                  ' đối tác (' +
+                  percent.replace('.', ',') +
+                  '%)';
               }
             }
           }
@@ -243,14 +359,20 @@ function initCharts(chartData) {
 
 // TASK-147: Update debt ratio progress bar
 function updateDebtProgress(barId, trackId, value) {
-    const number = Number(value);
-    const percent = Number.isFinite(number)
-        ? Math.max(0, Math.min(100, number))
-        : 0;
+  const number = Number(value);
 
-    const bar = document.getElementById(barId);
-    const track = document.getElementById(trackId);
+  const percent = Number.isFinite(number)
+    ? Math.max(0, Math.min(100, number))
+    : 0;
 
-    if (bar) bar.style.width = percent + '%';
-    if (track) track.setAttribute('aria-valuenow', String(percent));
+  const bar = document.getElementById(barId);
+  const track = document.getElementById(trackId);
+
+  if (bar) {
+    bar.style.width = percent + '%';
+  }
+
+  if (track) {
+    track.setAttribute('aria-valuenow', String(percent));
+  }
 }
