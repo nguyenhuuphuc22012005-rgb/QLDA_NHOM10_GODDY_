@@ -1,15 +1,56 @@
 
 /**
  * Module: Dashboard & Thống Kê KPI
+ * TASK-151: Refresh Dashboard with smooth loading animation
  */
-async function loadDashboard() {
-  try {
-    const periodSelect = document.getElementById('dashboardPeriodSelect');
-    const period = periodSelect ? periodSelect.value : 'all';
-    const res = await fetch(`/api/dashboard/stats?period=${period}`);
-    const data = await res.json();
 
-    if (data.success) {
+let dashboardRefreshPromise = null;
+
+async function loadDashboard() {
+  // Avoid duplicate requests when the user clicks repeatedly.
+  if (dashboardRefreshPromise) {
+    return dashboardRefreshPromise;
+  }
+
+  const refreshButton = document.getElementById('dashboardRefreshBtn');
+  const refreshIcon = document.getElementById('dashboardRefreshIcon');
+  const refreshText = document.getElementById('dashboardRefreshText');
+
+  const startedAt = Date.now();
+
+  if (refreshButton) {
+    refreshButton.disabled = true;
+    refreshButton.setAttribute('aria-busy', 'true');
+  }
+
+  if (refreshIcon) {
+    refreshIcon.classList.add('fa-spin');
+  }
+
+  if (refreshText) {
+    refreshText.textContent = 'Đang làm mới...';
+  }
+
+  dashboardRefreshPromise = (async () => {
+    try {
+      const periodSelect = document.getElementById('dashboardPeriodSelect');
+      const period = periodSelect ? periodSelect.value : 'all';
+
+      const res = await fetch(
+        `/api/dashboard/stats?period=${encodeURIComponent(period)}`,
+        { cache: 'no-store' }
+      );
+
+      if (!res.ok) {
+        throw new Error(`HTTP ${res.status}`);
+      }
+
+      const data = await res.json();
+
+      if (!data.success) {
+        throw new Error(data.message || 'Không thể tải Dashboard.');
+      }
+
       const vRevenue = document.getElementById('valTotalRevenue');
       if (vRevenue) vRevenue.textContent = formatMoney(data.stats.totalRevenue);
 
@@ -44,7 +85,7 @@ async function loadDashboard() {
         initCharts(data.chartData);
       }
 
-      // TASK-150: Top 5 debtors by outstanding amount
+      // TASK-150: Top 5 debtors
       const tbody = document.getElementById('topDebtorsTableBody');
 
       if (tbody) {
@@ -76,31 +117,26 @@ async function loadDashboard() {
           const invoiceCount = Number(td.invoiceCount) || 0;
           const amount = Number(td.totalRemaining) || 0;
 
-          // Company name
           const nameCell = row.insertCell();
           const strong = document.createElement('strong');
           strong.textContent = `${index + 1}. ${name}`;
           nameCell.appendChild(strong);
 
-          // Tax code
           const taxCell = row.insertCell();
           const code = document.createElement('code');
           code.textContent = taxCode || '-';
           taxCell.appendChild(code);
 
-          // Outstanding invoice count
           const countCell = row.insertCell();
           const badge = document.createElement('span');
           badge.className = 'badge bg-secondary';
           badge.textContent = `${invoiceCount} hóa đơn`;
           countCell.appendChild(badge);
 
-          // Outstanding amount
           const amountCell = row.insertCell();
           amountCell.className = 'text-danger fw-bold';
           amountCell.textContent = formatMoney(amount);
 
-          // Quick details button
           const actionCell = row.insertCell();
           const button = document.createElement('button');
 
@@ -121,17 +157,63 @@ async function loadDashboard() {
           actionCell.appendChild(button);
         });
       }
+
+      return data;
+    } catch (err) {
+      console.error('Lỗi tải Dashboard:', err);
+      throw err;
+    } finally {
+      // Keep the loading animation visible for at least 500ms.
+      const elapsed = Date.now() - startedAt;
+      const remaining = Math.max(0, 500 - elapsed);
+
+      if (remaining > 0) {
+        await new Promise(resolve => setTimeout(resolve, remaining));
+      }
+
+      if (refreshIcon) {
+        refreshIcon.classList.remove('fa-spin');
+      }
+
+      if (refreshButton) {
+        refreshButton.disabled = false;
+        refreshButton.removeAttribute('aria-busy');
+      }
+
+      if (refreshText) {
+        refreshText.textContent = 'Làm mới dữ liệu';
+      }
     }
-  } catch (err) {
-    console.error('Lỗi tải Dashboard:', err);
+  })();
+
+  try {
+    return await dashboardRefreshPromise;
+  } finally {
+    dashboardRefreshPromise = null;
   }
 }
 
 /**
- * TASK-150: Open debt report for selected debtor.
- *
- * Note: debt.js needs to use window.task150DebtorFilter
- * to filter the corresponding invoice list.
+ * TASK-151: Manual refresh action.
+ */
+async function refreshDashboardData() {
+  try {
+    await loadDashboard();
+
+    if (typeof showDebtToast === 'function') {
+      showDebtToast('Đã làm mới dữ liệu Dashboard!', 'success');
+    }
+  } catch (err) {
+    if (typeof showDebtToast === 'function') {
+      showDebtToast('Không thể làm mới dữ liệu Dashboard.', 'danger');
+    } else {
+      alert('Không thể làm mới dữ liệu Dashboard.');
+    }
+  }
+}
+
+/**
+ * TASK-150: Open debt details for selected company.
  */
 function openTopDebtorDetails(companyName, taxCode) {
   if (typeof switchTab !== 'function') return;
@@ -140,7 +222,6 @@ function openTopDebtorDetails(companyName, taxCode) {
 
   const section = document.getElementById('section-debt');
 
-  // Do not load debt details if the user cannot access this tab.
   if (!section || section.style.display === 'none') {
     return;
   }

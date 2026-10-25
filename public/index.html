@@ -192,9 +192,21 @@
               <option value="quarter">📊 Quý này (Q4/2026)</option>
               <option value="month">⏱️ Tháng này (Tháng 10)</option>
             </select>
-            <button class="btn btn-sm btn-outline-secondary" onclick="loadDashboard()" title="Tải lại số liệu">
-              <i class="fa-solid fa-rotate"></i>
-            </button>
+            <!-- TASK-151: Dashboard Refresh Button -->
+<button
+  id="dashboardRefreshBtn"
+  type="button"
+  class="btn btn-sm btn-outline-primary d-inline-flex align-items-center gap-2 px-3"
+  onclick="refreshDashboardData()"
+  title="Làm mới dữ liệu Dashboard"
+>
+  <i
+    id="dashboardRefreshIcon"
+    class="fa-solid fa-rotate"
+    aria-hidden="true"
+  ></i>
+  <span id="dashboardRefreshText">Làm mới dữ liệu</span>
+</button>
           </div>
         </div>
 
