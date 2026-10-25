@@ -67,36 +67,95 @@ function initCharts(chartData) {
     industryChartInstance = null;
   }
 
+  // TASK-148: Smooth 12-month revenue chart
   const canvasRev = document.getElementById('revenueChart');
+
   if (canvasRev && typeof Chart !== 'undefined') {
     const ctxRev = canvasRev.getContext('2d');
+
+    const gradient = ctxRev.createLinearGradient(0, 0, 0, 350);
+    gradient.addColorStop(0, 'rgba(79, 70, 229, 0.30)');
+    gradient.addColorStop(1, 'rgba(79, 70, 229, 0.01)');
+
+    const revenueValues = Array.isArray(chartData.revenueByMonth)
+      ? chartData.revenueByMonth
+      : [];
+
+    const revenueLabels = Array.isArray(chartData.labels)
+      ? chartData.labels
+      : [];
+
+    const formatRevenue = value =>
+      new Intl.NumberFormat('vi-VN', {
+        maximumFractionDigits: 2
+      }).format(Number(value) || 0);
+
     revenueChartInstance = new Chart(ctxRev, {
       type: 'line',
       data: {
-        labels: chartData.labels,
+        labels: revenueLabels,
         datasets: [{
           label: 'Doanh thu thực tế (triệu VNĐ)',
-          data: chartData.revenueByMonth,
+          data: revenueValues,
           borderColor: '#4f46e5',
-          backgroundColor: 'rgba(79, 70, 229, 0.08)',
+          backgroundColor: gradient,
           fill: true,
-          tension: 0.35,
+          tension: 0.4,
           borderWidth: 3,
-          pointBackgroundColor: '#4f46e5',
-          pointRadius: 4
+          pointBackgroundColor: '#ffffff',
+          pointBorderColor: '#4f46e5',
+          pointBorderWidth: 2,
+          pointRadius: 4,
+          pointHoverRadius: 7,
+          pointHoverBackgroundColor: '#4f46e5',
+          pointHoverBorderColor: '#ffffff'
         }]
       },
       options: {
         responsive: true,
-        plugins: { legend: { display: false } },
+        maintainAspectRatio: true,
+        interaction: {
+          mode: 'index',
+          intersect: false
+        },
+        animation: {
+          duration: 1200,
+          easing: 'easeOutQuart'
+        },
+        plugins: {
+          legend: {
+            display: false
+          },
+          tooltip: {
+            backgroundColor: '#1e293b',
+            padding: 12,
+            cornerRadius: 10,
+            displayColors: false,
+            callbacks: {
+              label: context =>
+                'Doanh thu: ' + formatRevenue(context.parsed.y) + ' triệu VNĐ'
+            }
+          }
+        },
         scales: {
-          y: { grid: { color: '#f1f5f9' }, ticks: { callback: v => v + ' tr' } },
-          x: { grid: { display: false } }
+          y: {
+            beginAtZero: true,
+            grid: {
+              color: '#f1f5f9'
+            },
+            ticks: {
+              callback: value => formatRevenue(value) + ' tr'
+            }
+          },
+          x: {
+            grid: {
+              display: false
+            }
+          }
         }
       }
     });
   }
-
   const canvasInd = document.getElementById('industryChart');
   if (canvasInd && typeof Chart !== 'undefined') {
     const ctxInd = canvasInd.getContext('2d');
