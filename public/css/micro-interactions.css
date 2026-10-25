@@ -1,0 +1,218 @@
+
+/* TASK-180: Micro-interactions & Toast UI */
+
+:root {
+    --goddy-motion-fast: 160ms;
+    --goddy-motion-normal: 240ms;
+    --goddy-motion-easing: cubic-bezier(.2, .8, .2, 1);
+}
+
+/* Buttons */
+button,
+.btn,
+[role="button"] {
+    transition: background-color var(--goddy-motion-fast) ease, border-color var(--goddy-motion-fast) ease, box-shadow var(--goddy-motion-fast) ease, transform var(--goddy-motion-fast) ease;
+}
+
+@media (hover: hover) {
+    button:not(:disabled):hover,
+    .btn:not(:disabled):hover {
+        filter: brightness(1.05);
+    }
+
+    .card:hover,
+    .stat-card:hover,
+    .kpi-card:hover {
+        transform: translateY(-2px);
+    }
+
+    tbody tr:hover {
+        background-color: rgba(99, 102, 241, 0.055);
+    }
+}
+
+button:not(:disabled):active,
+.btn:not(:disabled):active {
+    transform: scale(.98);
+}
+
+button:disabled {
+    cursor: not-allowed;
+}
+
+/* Inputs */
+input,
+select,
+textarea {
+    transition: border-color var(--goddy-motion-fast) ease, box-shadow var(--goddy-motion-fast) ease;
+}
+
+    input:focus-visible,
+    select:focus-visible,
+    textarea:focus-visible,
+    button:focus-visible,
+    a:focus-visible {
+        outline: 2px solid #6366f1;
+        outline-offset: 2px;
+    }
+
+/* Cards */
+.card,
+.stat-card,
+.kpi-card {
+    transition: transform var(--goddy-motion-normal) var(--goddy-motion-easing), box-shadow var(--goddy-motion-normal) ease;
+}
+
+/* Toast container */
+.goddy-toast-container {
+    position: fixed;
+    top: 22px;
+    right: 22px;
+    z-index: 2147483000;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    width: min(390px, calc(100vw - 32px));
+    pointer-events: none;
+}
+
+/* Toast */
+.goddy-toast {
+    --toast-accent: #3b82f6;
+    --toast-icon-bg: #dbeafe;
+    display: flex;
+    align-items: flex-start;
+    gap: 12px;
+    padding: 15px;
+    border: 1px solid #e5e7eb;
+    border-left: 4px solid var(--toast-accent);
+    border-radius: 12px;
+    background: #ffffff;
+    color: #111827;
+    box-shadow: 0 12px 35px rgba(15, 23, 42, .18);
+    pointer-events: auto;
+    animation: goddy-toast-in 260ms ease-out both;
+}
+
+.goddy-toast--success {
+    --toast-accent: #16a34a;
+    --toast-icon-bg: #dcfce7;
+}
+
+.goddy-toast--error {
+    --toast-accent: #dc2626;
+    --toast-icon-bg: #fee2e2;
+}
+
+.goddy-toast--warning {
+    --toast-accent: #d97706;
+    --toast-icon-bg: #fef3c7;
+}
+
+.goddy-toast--info {
+    --toast-accent: #2563eb;
+    --toast-icon-bg: #dbeafe;
+}
+
+.goddy-toast__icon {
+    display: inline-flex;
+    flex: 0 0 30px;
+    align-items: center;
+    justify-content: center;
+    width: 30px;
+    height: 30px;
+    border-radius: 50%;
+    background: var(--toast-icon-bg);
+    color: var(--toast-accent);
+    font-size: 18px;
+    font-weight: 800;
+}
+
+.goddy-toast__content {
+    flex: 1;
+    min-width: 0;
+}
+
+.goddy-toast__title {
+    display: block;
+    margin-bottom: 4px;
+    font-size: 14px;
+    font-weight: 700;
+}
+
+.goddy-toast__message {
+    overflow-wrap: anywhere;
+    color: #4b5563;
+    font-size: 13px;
+    line-height: 1.5;
+}
+
+.goddy-toast__close {
+    display: inline-flex;
+    flex: 0 0 24px;
+    align-items: center;
+    justify-content: center;
+    width: 24px;
+    height: 24px;
+    padding: 0;
+    border: 0;
+    border-radius: 6px;
+    background: transparent;
+    color: #6b7280;
+    cursor: pointer;
+    font-size: 23px;
+    line-height: 1;
+}
+
+    .goddy-toast__close:hover {
+        background: #f3f4f6;
+        color: #111827;
+    }
+
+.goddy-toast--leaving {
+    animation: goddy-toast-out 220ms ease-in forwards;
+}
+
+@keyframes goddy-toast-in {
+    from {
+        opacity: 0;
+        transform: translateX(24px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateX(0);
+    }
+}
+
+@keyframes goddy-toast-out {
+    to {
+        opacity: 0;
+        transform: translateX(24px);
+    }
+}
+
+/* Mobile */
+@media (max-width: 600px) {
+    .goddy-toast-container {
+        top: 12px;
+        right: 12px;
+        left: 12px;
+        width: auto;
+    }
+
+    .goddy-toast {
+        padding: 12px;
+    }
+}
+
+/* Accessibility */
+@media (prefers-reduced-motion: reduce) {
+    *,
+    *::before,
+    *::after {
+        scroll-behavior: auto !important;
+        animation-duration: 0.01ms !important;
+        transition-duration: 0.01ms !important;
+    }
+}
