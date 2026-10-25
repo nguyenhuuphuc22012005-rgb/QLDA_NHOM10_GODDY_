@@ -156,23 +156,86 @@ function initCharts(chartData) {
       }
     });
   }
+  // TASK-149: Partner industry composition doughnut chart
   const canvasInd = document.getElementById('industryChart');
+
   if (canvasInd && typeof Chart !== 'undefined') {
     const ctxInd = canvasInd.getContext('2d');
+    const industryShare = chartData.industryShare || {};
+
+    const labels = Array.isArray(industryShare.labels)
+      ? industryShare.labels
+      : [];
+
+    const values = Array.isArray(industryShare.series)
+      ? industryShare.series.map(value => {
+          const number = Number(value);
+          return Number.isFinite(number) && number > 0 ? number : 0;
+        })
+      : [];
+
+    const colors = [
+      '#4f46e5', '#10b981', '#f59e0b', '#ec4899',
+      '#64748b', '#06b6d4', '#8b5cf6', '#f97316'
+    ];
+
+    const totalPartners = values.reduce((sum, value) => sum + value, 0);
+
     industryChartInstance = new Chart(ctxInd, {
       type: 'doughnut',
       data: {
-        labels: chartData.industryShare.labels,
+        labels,
         datasets: [{
-          data: chartData.industryShare.series,
-          backgroundColor: ['#4f46e5', '#10b981', '#f59e0b', '#ec4899', '#64748b'],
-          borderWidth: 2,
-          borderColor: '#fff'
+          label: 'Đối tác',
+          data: values,
+          backgroundColor: labels.map((_, index) => colors[index % colors.length]),
+          borderColor: '#ffffff',
+          borderWidth: 3,
+          hoverBorderWidth: 4,
+          hoverOffset: 10,
+          spacing: 2,
+          borderRadius: 4
         }]
       },
       options: {
         responsive: true,
-        plugins: { legend: { position: 'bottom', labels: { boxWidth: 12, padding: 14 } } }
+        maintainAspectRatio: true,
+        cutout: '68%',
+        animation: {
+          animateRotate: true,
+          animateScale: true,
+          duration: 1100,
+          easing: 'easeOutQuart'
+        },
+        plugins: {
+          legend: {
+            position: 'bottom',
+            labels: {
+              boxWidth: 12,
+              boxHeight: 12,
+              padding: 16,
+              usePointStyle: true,
+              pointStyle: 'circle'
+            }
+          },
+          tooltip: {
+            backgroundColor: '#1e293b',
+            padding: 12,
+            cornerRadius: 10,
+            callbacks: {
+              label: context => {
+                const value = Number(context.parsed) || 0;
+                const percent = totalPartners > 0
+                  ? (value / totalPartners * 100).toFixed(1)
+                  : '0.0';
+
+                return ' ' + context.label + ': ' +
+                  new Intl.NumberFormat('vi-VN').format(value) +
+                  ' đối tác (' + percent.replace('.', ',') + '%)';
+              }
+            }
+          }
+        }
       }
     });
   }
