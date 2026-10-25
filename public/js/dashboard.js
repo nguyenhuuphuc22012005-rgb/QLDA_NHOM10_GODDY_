@@ -18,8 +18,10 @@ async function loadDashboard() {
       if (vPlacement) vPlacement.textContent = data.stats.placementCount + ' Deals';
       const vColRate = document.getElementById('valCollectionRate');
       if (vColRate) vColRate.textContent = data.stats.collectionRate + '%';
+      updateDebtProgress('collectionProgressBar', 'collectionProgressTrack', data.stats.collectionRate);
       const vBadDebt = document.getElementById('valBadDebtRate');
       if (vBadDebt) vBadDebt.textContent = data.stats.badDebtRate + '%';
+      updateDebtProgress('badDebtProgressBar', 'badDebtProgressTrack', data.stats.badDebtRate);
 
       if (data.chartData) {
         initCharts(data.chartData);
@@ -115,4 +117,18 @@ function initCharts(chartData) {
       }
     });
   }
+}
+
+// TASK-147: Update debt ratio progress bar
+function updateDebtProgress(barId, trackId, value) {
+    const number = Number(value);
+    const percent = Number.isFinite(number)
+        ? Math.max(0, Math.min(100, number))
+        : 0;
+
+    const bar = document.getElementById(barId);
+    const track = document.getElementById(trackId);
+
+    if (bar) bar.style.width = percent + '%';
+    if (track) track.setAttribute('aria-valuenow', String(percent));
 }

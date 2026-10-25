@@ -247,26 +247,46 @@
         </div>
 
         <!-- KPI Ratios -->
-        <div class="row g-4 mt-2">
-          <div class="col-md-6">
-            <div class="p-3 bg-white border rounded-3 d-flex align-items-center justify-content-between">
-              <div>
-                <span class="text-muted small fw-bold text-uppercase">Tỷ Lệ Thu Hồi Công Nợ</span>
-                <h4 class="mb-0 text-success fw-bold" id="valCollectionRate">0%</h4>
-              </div>
-              <i class="fa-solid fa-chart-line text-success fs-2 opacity-75"></i>
-            </div>
-          </div>
-          <div class="col-md-6">
-            <div class="p-3 bg-white border rounded-3 d-flex align-items-center justify-content-between">
-              <div>
-                <span class="text-muted small fw-bold text-uppercase">Tỷ Lệ Nợ Quá Hạn / Tổng Nợ</span>
-                <h4 class="mb-0 text-danger fw-bold" id="valBadDebtRate">0%</h4>
-              </div>
-              <i class="fa-solid fa-chart-pie text-danger fs-2 opacity-75"></i>
-            </div>
-          </div>
-        </div>
+<div class="row g-4 mt-2 dashboard-progress-row">
+  <div class="col-md-6">
+    <div class="debt-progress-card">
+      <div class="debt-progress-heading">
+        <span><i class="fa-solid fa-chart-line text-success me-2"></i>Tỷ lệ thu hồi nợ</span>
+        <strong class="text-success" id="valCollectionRate">0%</strong>
+      </div>
+      <div class="debt-progress-track"
+           id="collectionProgressTrack"
+           role="progressbar"
+           aria-label="Tỷ lệ thu hồi nợ"
+           aria-valuemin="0"
+           aria-valuemax="100"
+           aria-valuenow="0">
+        <div class="debt-progress-fill debt-progress-fill--success"
+             id="collectionProgressBar"></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="col-md-6">
+    <div class="debt-progress-card">
+      <div class="debt-progress-heading">
+        <span><i class="fa-solid fa-triangle-exclamation text-danger me-2"></i>Tỷ lệ nợ quá hạn</span>
+        <strong class="text-danger" id="valBadDebtRate">0%</strong>
+      </div>
+      <div class="debt-progress-track"
+           id="badDebtProgressTrack"
+           role="progressbar"
+           aria-label="Tỷ lệ nợ quá hạn"
+           aria-valuemin="0"
+           aria-valuemax="100"
+           aria-valuenow="0">
+        <div class="debt-progress-fill debt-progress-fill--danger"
+             id="badDebtProgressBar"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
 
         <!-- 2 Charts -->
         <div class="row g-4 mt-2">

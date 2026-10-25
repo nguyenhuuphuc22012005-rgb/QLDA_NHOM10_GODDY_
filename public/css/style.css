@@ -1277,3 +1277,48 @@ body {
     .metric-card.kpi-card .metric-icon-box.kpi-icon { width: 40px; height: 40px; font-size: 17px; }
 }
 @media (prefers-reduced-motion: reduce) { .metric-card.kpi-card { transition: none; } .metric-card.kpi-card:hover { transform: none; } }
+
+/* TASK-147: Debt ratio progress bars */
+.debt-progress-card {
+    background: #fff;
+    border: 1px solid #e2e8f0;
+    border-radius: 18px;
+    padding: 24px;
+    box-shadow: 0 8px 24px rgba(15,23,42,.05);
+}
+
+.debt-progress-heading {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    margin-bottom: 18px;
+    font-weight: 700;
+}
+
+.debt-progress-track {
+    height: 14px;
+    width: 100%;
+    background: #e2e8f0;
+    border-radius: 999px;
+    overflow: hidden;
+}
+
+.debt-progress-fill {
+    height: 100%;
+    width: 0%;
+    border-radius: inherit;
+    transition: width .6s ease;
+}
+
+.debt-progress-fill--success {
+    background: linear-gradient(90deg,#15803d,#4ade80);
+}
+
+.debt-progress-fill--danger {
+    background: linear-gradient(90deg,#b91c1c,#fb7185);
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .debt-progress-fill { transition: none; }
+}
