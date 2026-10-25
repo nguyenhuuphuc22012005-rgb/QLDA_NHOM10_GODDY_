@@ -1322,3 +1322,47 @@ body {
 @media (prefers-reduced-motion: reduce) {
     .debt-progress-fill { transition: none; }
 }
+/* TASK-146: KPI value layout fix */
+.dashboard-kpi-row .metric-card.kpi-card .metric-value {
+    font-size: clamp(18px, 1.65vw, 26px);
+    overflow-wrap: normal;
+    word-break: normal;
+    white-space: nowrap;
+}
+
+.dashboard-kpi-row .metric-card.kpi-card {
+    gap: 8px;
+}
+
+@media (max-width: 420px) {
+    .dashboard-kpi-row .metric-card.kpi-card .metric-value {
+        font-size: 18px;
+    }
+}
+
+/* TASK-146: Prevent KPI amounts overlapping icons */
+.dashboard-kpi-row .metric-card.kpi-card {
+    flex-wrap: wrap;
+}
+
+.dashboard-kpi-row .metric-card.kpi-card .kpi-card-content {
+    flex: 1 1 100%;
+    min-width: 0;
+}
+
+.dashboard-kpi-row .metric-card.kpi-card .metric-value {
+    font-size: clamp(18px, 1.65vw, 26px);
+    white-space: normal;
+    overflow-wrap: anywhere;
+    padding-right: 0;
+}
+
+.dashboard-kpi-row .metric-card.kpi-card .metric-icon-box.kpi-icon {
+    position: absolute;
+    right: 18px;
+    top: 18px;
+}
+
+.dashboard-kpi-row .metric-card.kpi-card .metric-title {
+    padding-right: 60px;
+}
