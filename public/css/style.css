@@ -1243,3 +1243,126 @@ body {
         -webkit-print-color-adjust: exact !important;
     }
 }
+
+/* =========================================================
+   TASK 146 - MODERN GRADIENT DASHBOARD KPI CARDS
+   ========================================================= */
+.dashboard-kpi-row > div { min-width: 0; }
+.metric-card.kpi-card {
+    position: relative; isolation: isolate; overflow: hidden; min-height: 174px; height: 100%;
+    padding: 24px; gap: 12px; border: 1px solid rgba(255,255,255,.22); border-radius: 20px;
+    color: #fff; box-shadow: 0 10px 24px rgba(15,23,42,.10);
+    transition: transform .25s ease, box-shadow .25s ease, filter .25s ease;
+}
+.metric-card.kpi-card:hover { transform: translateY(-5px); box-shadow: 0 18px 34px rgba(15,23,42,.17); filter: saturate(1.08); }
+.kpi-card--revenue { background: linear-gradient(135deg,#047857 0%,#10b981 55%,#34d399 100%); }
+.kpi-card--receivables { background: linear-gradient(135deg,#1d4ed8 0%,#3b82f6 55%,#60a5fa 100%); }
+.kpi-card--overdue { background: linear-gradient(135deg,#b91c1c 0%,#ef4444 55%,#fb7185 100%); }
+.kpi-card--placements { background: linear-gradient(135deg,#6d28d9 0%,#8b5cf6 55%,#a78bfa 100%); }
+.kpi-card-content { position: relative; z-index: 2; min-width: 0; }
+.metric-card.kpi-card .metric-title { margin-bottom: 12px; color: rgba(255,255,255,.92); font-size: 11px; font-weight: 700; line-height: 1.5; letter-spacing: .65px; text-transform: uppercase; }
+.metric-card.kpi-card .metric-value { color: #fff !important; font-size: clamp(20px,1.8vw,28px); font-weight: 800; line-height: 1.25; letter-spacing: -.7px; overflow-wrap: anywhere; font-variant-numeric: tabular-nums; }
+.kpi-card-caption { display: flex; align-items: center; gap: 7px; margin-top: 13px; color: rgba(255,255,255,.9); font-size: 11px; font-weight: 500; line-height: 1.4; }
+.kpi-card-caption i { flex-shrink: 0; }
+.metric-card.kpi-card .metric-icon-box.kpi-icon { position: relative; z-index: 2; display: flex; flex-shrink: 0; align-items: center; justify-content: center; width: 54px; height: 54px; border: 1px solid rgba(255,255,255,.32); border-radius: 16px; background: rgba(255,255,255,.18); color: #fff; font-size: 23px; box-shadow: 0 8px 18px rgba(15,23,42,.08); backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px); }
+.kpi-decoration { position: absolute; z-index: 1; right: -32px; bottom: -58px; width: 150px; height: 150px; border: 1px solid rgba(255,255,255,.15); border-radius: 50%; background: rgba(255,255,255,.08); pointer-events: none; }
+.kpi-decoration::after { position: absolute; top: -30px; left: -36px; width: 105px; height: 105px; border: 1px solid rgba(255,255,255,.12); border-radius: 50%; background: rgba(255,255,255,.06); content: ""; }
+@media (max-width: 767.98px) {
+    .metric-card.kpi-card { min-height: 155px; padding: 19px; }
+    .metric-card.kpi-card .metric-icon-box.kpi-icon { width: 46px; height: 46px; border-radius: 14px; font-size: 20px; }
+}
+@media (max-width: 420px) {
+    .metric-card.kpi-card { padding: 16px; }
+    .metric-card.kpi-card .metric-value { font-size: 21px; }
+    .metric-card.kpi-card .metric-icon-box.kpi-icon { width: 40px; height: 40px; font-size: 17px; }
+}
+@media (prefers-reduced-motion: reduce) { .metric-card.kpi-card { transition: none; } .metric-card.kpi-card:hover { transform: none; } }
+
+/* TASK-147: Debt ratio progress bars */
+.debt-progress-card {
+    background: #fff;
+    border: 1px solid #e2e8f0;
+    border-radius: 18px;
+    padding: 24px;
+    box-shadow: 0 8px 24px rgba(15,23,42,.05);
+}
+
+.debt-progress-heading {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    margin-bottom: 18px;
+    font-weight: 700;
+}
+
+.debt-progress-track {
+    height: 14px;
+    width: 100%;
+    background: #e2e8f0;
+    border-radius: 999px;
+    overflow: hidden;
+}
+
+.debt-progress-fill {
+    height: 100%;
+    width: 0%;
+    border-radius: inherit;
+    transition: width .6s ease;
+}
+
+.debt-progress-fill--success {
+    background: linear-gradient(90deg,#15803d,#4ade80);
+}
+
+.debt-progress-fill--danger {
+    background: linear-gradient(90deg,#b91c1c,#fb7185);
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .debt-progress-fill { transition: none; }
+}
+/* TASK-146: KPI value layout fix */
+.dashboard-kpi-row .metric-card.kpi-card .metric-value {
+    font-size: clamp(18px, 1.65vw, 26px);
+    overflow-wrap: normal;
+    word-break: normal;
+    white-space: nowrap;
+}
+
+.dashboard-kpi-row .metric-card.kpi-card {
+    gap: 8px;
+}
+
+@media (max-width: 420px) {
+    .dashboard-kpi-row .metric-card.kpi-card .metric-value {
+        font-size: 18px;
+    }
+}
+
+/* TASK-146: Prevent KPI amounts overlapping icons */
+.dashboard-kpi-row .metric-card.kpi-card {
+    flex-wrap: wrap;
+}
+
+.dashboard-kpi-row .metric-card.kpi-card .kpi-card-content {
+    flex: 1 1 100%;
+    min-width: 0;
+}
+
+.dashboard-kpi-row .metric-card.kpi-card .metric-value {
+    font-size: clamp(18px, 1.65vw, 26px);
+    white-space: normal;
+    overflow-wrap: anywhere;
+    padding-right: 0;
+}
+
+.dashboard-kpi-row .metric-card.kpi-card .metric-icon-box.kpi-icon {
+    position: absolute;
+    right: 18px;
+    top: 18px;
+}
+
+.dashboard-kpi-row .metric-card.kpi-card .metric-title {
+    padding-right: 60px;
+}

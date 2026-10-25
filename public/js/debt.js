@@ -1,8 +1,10 @@
-﻿/**
+﻿
+/**
  * Module: Quản lý Công nợ & Báo cáo Tuổi nợ
  * Task 116: Bảng chi tiết công nợ và phân loại tuổi nợ.
  * Task 117: Modal thu tiền, hiển thị dư nợ và kiểm tra số tiền thanh toán.
  * Task 118: Nút nhắc nợ từng dòng và Toast thông báo.
+ * TASK-150: Lọc công nợ từ Top 5 con nợ trên Dashboard.
  */
 
 function getDebtOverdueDays(item) {
@@ -132,8 +134,84 @@ function showDebtToast(message, type = 'success') {
   toastInstance.show();
 }
 
+/**
+ * TASK-150: Bộ lọc doanh nghiệp.
+ * Ưu tiên mã số thuế, dự phòng bằng tên doanh nghiệp.
+ */
+function matchesTopDebtorFilter(item, selectedDebtor) {
+  if (!selectedDebtor) return true;
+
+  const client = item.Client || {};
+
+  const selectedTax = String(selectedDebtor.taxCode || '').trim();
+  const itemTax = String(client.taxCode || '').trim();
+
+  if (selectedTax && itemTax) {
+    return selectedTax === itemTax;
+  }
+
+  const selectedName = String(selectedDebtor.companyName || '')
+    .trim()
+    .toLocaleLowerCase('vi');
+
+  const itemName = String(client.companyName || '')
+    .trim()
+    .toLocaleLowerCase('vi');
+
+  return Boolean(selectedName) && selectedName === itemName;
+}
+
+/**
+ * TASK-150: Hiển thị thông báo lọc và nút xóa bộ lọc.
+ */
+function renderTopDebtorFilterNotice(tbody, selectedDebtor) {
+  let notice = document.getElementById('task150DebtFilterNotice');
+
+  if (!notice) {
+    notice = document.createElement('div');
+    notice.id = 'task150DebtFilterNotice';
+    notice.className =
+      'alert alert-info d-flex align-items-center justify-content-between gap-2 flex-wrap';
+
+    const tableContainer = tbody.closest('.table-responsive');
+
+    if (tableContainer && tableContainer.parentNode) {
+      tableContainer.parentNode.insertBefore(notice, tableContainer);
+    }
+  }
+
+  notice.replaceChildren();
+  notice.style.display = selectedDebtor ? 'flex' : 'none';
+
+  if (!selectedDebtor) return;
+
+  const label = document.createElement('span');
+  label.textContent =
+    'Đang xem công nợ: ' + String(selectedDebtor.companyName || '-');
+
+  const resetButton = document.createElement('button');
+  resetButton.type = 'button';
+  resetButton.className = 'btn btn-sm btn-outline-primary';
+  resetButton.textContent = 'Xóa bộ lọc';
+  resetButton.addEventListener('click', clearTopDebtorFilter);
+
+  notice.append(label, resetButton);
+}
+
+/**
+ * TASK-150: Xóa bộ lọc, tải lại toàn bộ công nợ.
+ */
+function clearTopDebtorFilter() {
+  window.task150DebtorFilter = null;
+  loadDebt();
+}
+
+// TASK-150: Chỉ hiển thị kết quả của lần tải mới nhất.
+let debtLoadRequestId = 0;
+
 async function loadDebt() {
   const tbody = document.getElementById('debtTableBody');
+  const requestId = ++debtLoadRequestId;
 
   try {
     const res = await fetch('/api/debt/overview');
@@ -143,6 +221,9 @@ async function loadDebt() {
     }
 
     const data = await res.json();
+
+    // Tránh yêu cầu cũ ghi đè dữ liệu của yêu cầu mới.
+    if (requestId !== debtLoadRequestId) return;
 
     if (data.summary) {
       const aging1to30 = document.getElementById('debtAging1to30');
@@ -166,19 +247,36 @@ async function loadDebt() {
 
     tbody.innerHTML = '';
 
-    const debtList = Array.isArray(data.debtList) ? data.debtList : [];
+    const debtList = Array.isArray(data.debtList)
+      ? data.debtList
+      : [];
 
-    if (debtList.length === 0) {
-      tbody.innerHTML = `
-        <tr>
-          <td colspan="7" class="text-center text-muted py-4">
-            Hiện không có công nợ cần thu.
-          </td>
-        </tr>`;
+    // TASK-150: Lấy bộ lọc do Dashboard truyền sang.
+    const selectedDebtor = window.task150DebtorFilter || null;
+
+    const filteredDebtList = selectedDebtor
+      ? debtList.filter(item =>
+          matchesTopDebtorFilter(item, selectedDebtor)
+        )
+      : debtList;
+
+    renderTopDebtorFilterNotice(tbody, selectedDebtor);
+
+    if (filteredDebtList.length === 0) {
+      const message = selectedDebtor
+        ? 'Không tìm thấy hóa đơn công nợ của doanh nghiệp này.'
+        : 'Hiện không có công nợ cần thu.';
+
+      const row = tbody.insertRow();
+      const cell = row.insertCell();
+
+      cell.colSpan = 7;
+      cell.className = 'text-center text-muted py-4';
+      cell.textContent = message;
       return;
     }
 
-    debtList.forEach(item => {
+    filteredDebtList.forEach(item => {
       const days = getDebtOverdueDays(item);
       const aging = getDebtAgingInfo(days);
       const invoiceId = Number(item.id) || 0;
@@ -224,6 +322,8 @@ async function loadDebt() {
       tbody.appendChild(row);
     });
   } catch (err) {
+    if (requestId !== debtLoadRequestId) return;
+
     console.error('Lỗi tải báo cáo công nợ:', err);
 
     if (tbody) {
@@ -247,7 +347,10 @@ function openRecordPayment(invId, invCode, remaining) {
   const remainingAmount = Number(remaining);
 
   if (!Number.isFinite(remainingAmount) || remainingAmount <= 0) {
-    showDebtToast('Số nợ còn lại không hợp lệ hoặc hóa đơn đã được thanh toán.', 'warning');
+    showDebtToast(
+      'Số nợ còn lại không hợp lệ hoặc hóa đơn đã được thanh toán.',
+      'warning'
+    );
     return;
   }
 
@@ -272,7 +375,10 @@ function openRecordPayment(invId, invCode, remaining) {
   if (modalEl && typeof bootstrap !== 'undefined') {
     bootstrap.Modal.getOrCreateInstance(modalEl).show();
   } else {
-    showDebtToast('Không tìm thấy hộp thoại thu tiền hoặc Bootstrap.', 'danger');
+    showDebtToast(
+      'Không tìm thấy hộp thoại thu tiền hoặc Bootstrap.',
+      'danger'
+    );
   }
 }
 
@@ -287,7 +393,10 @@ async function submitRecordPayment(e) {
   const errorEl = document.getElementById('payAmountError');
 
   if (!amountEl) {
-    showDebtToast('Không tìm thấy ô nhập số tiền thanh toán.', 'danger');
+    showDebtToast(
+      'Không tìm thấy ô nhập số tiền thanh toán.',
+      'danger'
+    );
     return;
   }
 
@@ -299,9 +408,11 @@ async function submitRecordPayment(e) {
   if (!Number.isFinite(amount) || amount <= 0) {
     errorMessage = 'Số tiền thanh toán phải lớn hơn 0.';
   } else if (!Number.isFinite(remaining) || remaining <= 0) {
-    errorMessage = 'Số nợ còn lại không hợp lệ. Vui lòng mở lại hóa đơn.';
+    errorMessage =
+      'Số nợ còn lại không hợp lệ. Vui lòng mở lại hóa đơn.';
   } else if (amount > remaining) {
-    errorMessage = 'Số tiền thanh toán không được vượt quá số nợ còn lại.';
+    errorMessage =
+      'Số tiền thanh toán không được vượt quá số nợ còn lại.';
   }
 
   amountEl.setCustomValidity(errorMessage);
@@ -347,7 +458,10 @@ async function submitRecordPayment(e) {
     const data = await res.json().catch(() => ({}));
 
     if (!res.ok || !data.success) {
-      showDebtToast(data.message || 'Không thể ghi nhận thanh toán.', 'danger');
+      showDebtToast(
+        data.message || 'Không thể ghi nhận thanh toán.',
+        'danger'
+      );
       return;
     }
 
@@ -357,11 +471,18 @@ async function submitRecordPayment(e) {
       bootstrap.Modal.getInstance(modalEl)?.hide();
     }
 
-    showDebtToast(data.message || 'Ghi nhận thanh toán thành công!', 'success');
+    showDebtToast(
+      data.message || 'Ghi nhận thanh toán thành công!',
+      'success'
+    );
+
     await loadDebt();
   } catch (err) {
     console.error('Lỗi ghi nhận thanh toán:', err);
-    showDebtToast('Lỗi kết nối máy chủ khi ghi nhận thanh toán.', 'danger');
+    showDebtToast(
+      'Lỗi kết nối máy chủ khi ghi nhận thanh toán.',
+      'danger'
+    );
   } finally {
     if (submitButton) {
       submitButton.disabled = false;
@@ -377,7 +498,10 @@ async function sendDebtReminder(invoiceId, button = null, invoiceCode = '') {
   if (button?.disabled) return;
 
   if (!invoiceId) {
-    showDebtToast('Không xác định được hóa đơn cần nhắc nợ.', 'danger');
+    showDebtToast(
+      'Không xác định được hóa đơn cần nhắc nợ.',
+      'danger'
+    );
     return;
   }
 
@@ -400,19 +524,24 @@ async function sendDebtReminder(invoiceId, button = null, invoiceCode = '') {
 
     if (!res.ok || data.success === false) {
       showDebtToast(
-        data.message || `Không thể gửi nhắc nợ${invoiceCode ? ` cho ${invoiceCode}` : ''}.`,
+        data.message ||
+          `Không thể gửi nhắc nợ${invoiceCode ? ` cho ${invoiceCode}` : ''}.`,
         'danger'
       );
       return;
     }
 
     showDebtToast(
-      data.message || `Đã gửi lời nhắc nợ${invoiceCode ? ` cho ${invoiceCode}` : ''} thành công!`,
+      data.message ||
+        `Đã gửi lời nhắc nợ${invoiceCode ? ` cho ${invoiceCode}` : ''} thành công!`,
       'success'
     );
   } catch (err) {
     console.error('Lỗi gửi nhắc nợ:', err);
-    showDebtToast('Lỗi kết nối khi gửi nhắc nợ. Vui lòng thử lại.', 'danger');
+    showDebtToast(
+      'Lỗi kết nối khi gửi nhắc nợ. Vui lòng thử lại.',
+      'danger'
+    );
   } finally {
     if (button) {
       button.disabled = false;
@@ -454,10 +583,15 @@ async function exportDebtCSV() {
     });
 
     const csv = '\uFEFF' + rows.map(row =>
-      row.map(value => `"${String(value ?? '').replace(/"/g, '""')}"`).join(',')
+      row.map(value =>
+        `"${String(value ?? '').replace(/"/g, '""')}"`
+      ).join(',')
     ).join('\r\n');
 
-    const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+    const blob = new Blob([csv], {
+      type: 'text/csv;charset=utf-8;'
+    });
+
     const url = URL.createObjectURL(blob);
     const link = document.createElement('a');
 
@@ -469,7 +603,11 @@ async function exportDebtCSV() {
     link.remove();
 
     URL.revokeObjectURL(url);
-    showDebtToast('Đã xuất báo cáo công nợ CSV thành công.', 'success');
+
+    showDebtToast(
+      'Đã xuất báo cáo công nợ CSV thành công.',
+      'success'
+    );
   } catch (err) {
     console.error('Lỗi xuất CSV:', err);
     showDebtToast('Lỗi xuất CSV!', 'danger');
