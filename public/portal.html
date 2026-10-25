@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="color-scheme" content="dark">
+<title>Cổng thông tin khách hàng | GODDY Recruit</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" rel="stylesheet">
+<style>
+:root{color-scheme:dark;--bg:#090f1c;--surface:#131d2d;--surface2:#19263b;--border:#2b3b55;--text:#ecf3ff;--muted:#9db0cc;--primary:#6093ff;--good:#4dd9b0;--bad:#ff8595}
+*{box-sizing:border-box}body{margin:0;font-family:Inter,system-ui,sans-serif;color:var(--text);background:radial-gradient(ellipse 70% 45% at 55% -10%,#20335f 0,transparent 70%),var(--bg);min-height:100vh}button,input{font:inherit}button{cursor:pointer}a{color:inherit;text-decoration:none}.shell{max-width:1240px;margin:auto;padding:0 24px}.topbar{border-bottom:1px solid var(--border);background:#0d1625cc;backdrop-filter:blur(16px)}.top-inner{display:flex;align-items:center;justify-content:space-between;gap:16px;min-height:82px}.brand{display:flex;align-items:center;gap:12px}.brand-logo{display:grid;place-items:center;width:44px;height:44px;border-radius:13px;background:linear-gradient(135deg,#477bff,#8a5eff);font-size:20px}.brand strong{display:block;font-size:16px;letter-spacing:-.4px}.brand small{display:block;font-size:10px;color:var(--muted);margin-top:4px;letter-spacing:1px}.top-link{border:1px solid var(--border);padding:11px 15px;border-radius:10px;font-size:12px;color:#c7d7ee}.top-link:hover{border-color:var(--primary)}main{padding-top:62px;padding-bottom:70px}.eyebrow{font-size:11px;font-weight:800;letter-spacing:2px;color:#8cafff;text-transform:uppercase}.hero{max-width:790px;margin:0 auto 32px;text-align:center}.hero h1{font-size:clamp(29px,4.5vw,48px);letter-spacing:-1.7px;margin:15px 0}.hero p{color:var(--muted);font-size:14px;line-height:1.8;margin:0}.hero-icon{display:inline-grid;place-items:center;background:#294475;border:1px solid #43639b;width:66px;height:66px;border-radius:20px;font-size:26px;margin-bottom:19px;color:#a7c2ff}.card{background:var(--surface);border:1px solid var(--border);border-radius:20px;box-shadow:0 20px 70px #0002}.lookup{max-width:870px;margin:0 auto;padding:30px}.section-title{font-size:18px;margin:0 0 8px}.description{color:var(--muted);font-size:12px;line-height:1.7;margin:0 0 24px}.form-grid{display:grid;grid-template-columns:1fr 1fr;gap:17px}.field{display:flex;flex-direction:column;gap:9px}.field label{font-size:12px;font-weight:700;color:#d5e3fa}.field input{background:#0b1423;border:1px solid #34445e;border-radius:11px;color:#fff;outline:none;padding:14px 15px;width:100%;min-height:48px}.field input:focus{border-color:var(--primary);box-shadow:0 0 0 3px #6093ff22}.field input::placeholder{color:#7e92b1}.field small{color:var(--muted);font-size:11px}.toolbar{display:flex;justify-content:space-between;align-items:center;gap:15px;margin-top:22px}.privacy{display:flex;align-items:center;gap:8px;color:var(--muted);font-size:11px;line-height:1.5}.privacy i{color:var(--good)}.btn{border:1px solid var(--border);background:var(--surface2);color:var(--text);border-radius:11px;padding:13px 18px;font-weight:700;font-size:12px}.btn-primary{border-color:#638bff;background:linear-gradient(135deg,#447dff,#6e6dff);color:white;min-width:155px}.btn:hover{filter:brightness(1.12)}.btn:disabled{opacity:.65;cursor:wait}.notice{display:none;margin:18px auto 0;max-width:1100px;padding:15px 17px;border-radius:12px;border:1px solid var(--border);font-size:12px;line-height:1.7}.notice.show{display:block}.notice.error{color:#ffc3ca;background:#3a1d2a;border-color:#743749}.notice.info{color:#c6dcff;background:#172d4b;border-color:#33537f}.notice.success{color:#b9ffe9;background:#12352e;border-color:#2c7665}.results{max-width:1100px;margin:28px auto 0;display:none}.results.visible{display:block}.result-head{display:flex;justify-content:space-between;gap:16px;align-items:center;margin-bottom:16px}.result-head h2{margin:0;font-size:20px}.result-head p{margin:6px 0 0;color:var(--muted);font-size:12px}.tag{display:inline-block;border-radius:8px;padding:7px 11px;background:#243d64;color:#bcd5ff;font-weight:800;font-size:10px}.tag.paid{background:#123d35;color:#5fe7bc}.tag.overdue{background:#4b2632;color:#ffa2b0}.tag.pending{background:#4a3924;color:#ffdb9e}.stats{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:15px;margin-bottom:17px}.stat{padding:22px}.stat span{display:block;color:var(--muted);font-size:12px}.stat strong{display:block;margin-top:12px;font-size:clamp(19px,2.5vw,27px);overflow-wrap:anywhere}.stat i{float:right;color:var(--primary)}.panel{padding:23px;margin-top:16px}.panel h3{font-size:15px;margin:0 0 18px}.table-scroll{overflow:auto}table{border-collapse:collapse;width:100%;min-width:620px}th{text-align:left;color:var(--muted);font-size:10px;text-transform:uppercase;letter-spacing:.8px;background:#1b293e}th,td{padding:15px 13px;border-bottom:1px solid var(--border)}td{font-size:12px}tr:last-child td{border-bottom:0}.empty{color:var(--muted);font-size:12px;padding:15px 0}.features{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:15px;max-width:870px;margin:27px auto 0}.feature{padding:21px}.feature i{font-size:19px;color:var(--primary)}.feature h3{font-size:13px;margin:13px 0 7px}.feature p{font-size:11px;line-height:1.7;color:var(--muted);margin:0}footer{border-top:1px solid var(--border);padding:24px;text-align:center;color:var(--muted);font-size:11px}footer strong{color:#dbe7fb}[hidden]{display:none!important}@media(max-width:700px){.shell{padding:0 15px}.top-inner{min-height:72px}.top-link{font-size:0;padding:11px}.top-link i{font-size:14px}main{padding-top:38px}.lookup{padding:21px}.form-grid,.features{grid-template-columns:1fr}.toolbar{flex-direction:column;align-items:stretch}.btn-primary{width:100%}.stats{grid-template-columns:1fr}.result-head{align-items:flex-start;flex-direction:column}.feature{padding:17px}}
+</style>
+</head>
+<body>
+<header class="topbar"><div class="shell top-inner"><a class="brand" href="portal.html"><span class="brand-logo"><i class="fa-solid fa-shield-halved"></i></span><span><strong>GODDY RECRUIT</strong><small>CỔNG THÔNG TIN KHÁCH HÀNG</small></span></a><a class="top-link" href="index.html"><i class="fa-solid fa-arrow-left"></i> <span>Về trang hệ thống</span></a></div></header>
+<main class="shell">
+<div class="hero"><div class="hero-icon"><i class="fa-solid fa-building-shield"></i></div><div class="eyebrow">Customer Self-Service Portal</div><h1>Tra cứu thông tin của bạn<br>nhanh chóng, bảo mật</h1><p>Đăng nhập bằng tài khoản khách hàng được GODDY Recruit cấp để theo dõi hóa đơn, công nợ và tình hình tuyển dụng của doanh nghiệp.</p></div>
+<section class="card lookup" id="loginSection" aria-labelledby="loginTitle"><h2 class="section-title" id="loginTitle"><i class="fa-solid fa-right-to-bracket" style="color:var(--primary)"></i> Đăng nhập cổng khách hàng</h2><p class="description">Sử dụng tài khoản có vai trò khách hàng (client) đã được liên kết với doanh nghiệp.</p>
+<form id="loginForm"><div class="form-grid"><div class="field"><label for="username">Tên tài khoản hoặc email *</label><input id="username" name="username" autocomplete="username" required maxlength="100" placeholder="Nhập tên tài khoản hoặc email"><small>Tài khoản do GODDY Recruit cung cấp</small></div><div class="field"><label for="password">Mật khẩu *</label><input id="password" name="password" type="password" autocomplete="current-password" required placeholder="Nhập mật khẩu"><small>Không chia sẻ mật khẩu cho người khác</small></div></div><div class="toolbar"><div class="privacy"><i class="fa-solid fa-lock"></i><span>Dữ liệu doanh nghiệp chỉ hiển thị sau khi máy chủ xác thực tài khoản và quyền truy cập.</span></div><button id="submitBtn" class="btn btn-primary" type="submit"><i class="fa-solid fa-right-to-bracket"></i> Đăng nhập</button></div></form></section>
+<div id="notice" class="notice" role="status" aria-live="polite"></div>
+<section id="results" class="results" aria-live="polite" aria-label="Thông tin doanh nghiệp"><div class="result-head"><div><h2 id="companyName">Thông tin doanh nghiệp</h2><p id="companyMeta"></p></div><div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap"><span id="companyStatus" class="tag">Đã xác thực</span><button id="logoutBtn" class="btn" type="button"><i class="fa-solid fa-right-from-bracket"></i> Đăng xuất</button></div></div>
+<div class="stats"><div class="card stat"><i class="fa-solid fa-file-invoice"></i><span>Tổng hóa đơn</span><strong id="invoiceCount">0</strong></div><div class="card stat"><i class="fa-solid fa-wallet"></i><span>Công nợ hiện tại</span><strong id="outstanding">—</strong></div><div class="card stat"><i class="fa-solid fa-briefcase"></i><span>Vị trí tuyển dụng / Deal</span><strong id="dealCount">0</strong></div></div>
+<div class="card panel"><h3><i class="fa-solid fa-file-invoice-dollar" style="color:var(--primary)"></i> Danh sách hóa đơn</h3><div class="table-scroll"><table><thead><tr><th>Mã hóa đơn</th><th>Ngày lập</th><th>Hạn thanh toán</th><th>Số tiền</th><th>Trạng thái</th></tr></thead><tbody id="invoiceRows"></tbody></table></div></div>
+<div class="card panel"><h3><i class="fa-solid fa-briefcase" style="color:var(--primary)"></i> Vị trí tuyển dụng</h3><div class="table-scroll"><table><thead><tr><th>Mã vị trí</th><th>Vị trí</th><th>Phòng ban</th><th>Trạng thái</th></tr></thead><tbody id="jobRows"></tbody></table></div></div>
+<div class="card panel"><h3><i class="fa-solid fa-user-check" style="color:var(--primary)"></i> Kết quả tuyển dụng / Deal</h3><div class="table-scroll"><table><thead><tr><th>Mã deal</th><th>Vị trí</th><th>Ngày nhận việc</th><th>Trạng thái</th></tr></thead><tbody id="placementRows"></tbody></table></div></div>
+</section>
+<div class="features"><div class="card feature"><i class="fa-solid fa-shield-halved"></i><h3>Đăng nhập có xác thực</h3><p>Chỉ tài khoản khách hàng hợp lệ mới xem được dữ liệu doanh nghiệp được liên kết.</p></div><div class="card feature"><i class="fa-solid fa-file-invoice"></i><h3>Thông tin hóa đơn</h3><p>Theo dõi hóa đơn, thời hạn thanh toán và tình trạng công nợ.</p></div><div class="card feature"><i class="fa-solid fa-arrows-rotate"></i><h3>Cập nhật từ hệ thống</h3><p>Dữ liệu được lấy trực tiếp từ API GODDY Recruit sau khi đăng nhập.</p></div></div>
+</main><footer>© GODDY Recruit · Nhóm 10 · <strong>Cổng thông tin khách hàng</strong> · TASK-179</footer>
+<script>
+(() => {
+'use strict';
+const $ = id => document.getElementById(id);
+const text = value => String(value ?? '');
+const money = value => Number.isFinite(Number(value)) ? new Intl.NumberFormat('vi-VN',{style:'currency',currency:'VND',maximumFractionDigits:0}).format(Number(value)) : '—';
+const date = value => { if (!value) return '—'; const parts=String(value).slice(0,10).split('-'); return parts.length===3 ? `${parts[2]}/${parts[1]}/${parts[0]}` : text(value); };
+let accessToken = null; // Chỉ giữ JWT trong bộ nhớ trang; tải lại trang phải đăng nhập lại.
+function notice(message,kind='info'){const n=$('notice');n.textContent=message;n.className='notice show '+kind;}
+function clearNotice(){$('notice').className='notice';$('notice').textContent='';}
+function clearResults(){$('results').classList.remove('visible');for(const id of ['invoiceRows','jobRows','placementRows'])$(id).replaceChildren();}
+function cell(tr,value){const td=document.createElement('td');td.textContent=text(value);tr.appendChild(td);return td;}
+function statusCell(tr,value){const td=document.createElement('td'),b=document.createElement('span'),s=text(value||'Chưa xác định');b.className='tag '+(/paid|passed|completed|active/i.test(s)?'paid':/overdue|failed|cancelled|inactive/i.test(s)?'overdue':'pending');b.textContent=s;td.appendChild(b);tr.appendChild(td);}
+function emptyRow(body,count,message){const tr=document.createElement('tr');const td=cell(tr,message);td.colSpan=count;td.className='empty';body.appendChild(tr);}
+async function jsonResponse(response){const body=await response.json().catch(()=>null);if(!body)throw new Error('Máy chủ không trả về JSON hợp lệ.');if(!response.ok||body.success===false){if(response.status===401)throw new Error('Phiên đăng nhập không hợp lệ hoặc đã hết hạn.');if(response.status===403)throw new Error('Tài khoản không có quyền truy cập dữ liệu khách hàng.');throw new Error(body.message||'Không thể xử lý yêu cầu.');}return body;}
+function render(data){
+ if(!data.client||!data.summary)throw new Error('API thiếu thông tin doanh nghiệp hoặc thống kê.');
+ const c=data.client,s=data.summary,invoices=Array.isArray(data.invoices)?data.invoices:[],jobs=Array.isArray(data.jobs)?data.jobs:[],placements=Array.isArray(data.placements)?data.placements:[];
+ $('companyName').textContent=text(c.companyName||'Doanh nghiệp');
+ $('companyMeta').textContent='Mã số thuế: '+text(c.taxCode||'—')+' · Liên hệ: '+text(c.contactPerson||'—');
+ $('companyStatus').textContent=text(c.status||'Đã xác thực');
+ $('invoiceCount').textContent=text(invoices.length);
+ $('outstanding').textContent=money(s.totalRemaining);
+ $('dealCount').textContent=`${jobs.length} vị trí / ${placements.length} deal`;
+ const ib=$('invoiceRows');ib.replaceChildren();for(const x of invoices){const tr=document.createElement('tr');cell(tr,x.invoiceCode||x.id||'—');cell(tr,date(x.issueDate));cell(tr,date(x.dueDate));cell(tr,money(x.totalAmount));statusCell(tr,x.status);ib.appendChild(tr);}if(!invoices.length)emptyRow(ib,5,'Chưa có hóa đơn.');
+ const jb=$('jobRows');jb.replaceChildren();for(const x of jobs){const tr=document.createElement('tr');cell(tr,x.id);cell(tr,x.title||'—');cell(tr,x.department||'—');statusCell(tr,x.status);jb.appendChild(tr);}if(!jobs.length)emptyRow(jb,4,'Chưa có vị trí tuyển dụng.');
+ const pb=$('placementRows');pb.replaceChildren();for(const x of placements){const tr=document.createElement('tr');cell(tr,x.id);cell(tr,x.Job?.title||'—');cell(tr,date(x.onboardDate));statusCell(tr,x.status);pb.appendChild(tr);}if(!placements.length)emptyRow(pb,4,'Chưa có kết quả tuyển dụng.');
+ $('loginSection').hidden=true;$('results').classList.add('visible');
+}
+function logout(message){accessToken=null;$('password').value='';clearResults();$('loginSection').hidden=false;if(message)notice(message,'info');else clearNotice();window.scrollTo({top:0,behavior:'smooth'});}
+$('logoutBtn').addEventListener('click',()=>logout('Bạn đã đăng xuất khỏi cổng khách hàng.'));
+$('loginForm').addEventListener('submit',async event=>{
+ event.preventDefault();clearNotice();clearResults();
+ const username=$('username').value.trim(),password=$('password').value;
+ if(!username||!password){notice('Vui lòng nhập tài khoản và mật khẩu.','error');return;}
+ const btn=$('submitBtn');btn.disabled=true;btn.textContent='Đang xác thực...';
+ try{
+  const login=await jsonResponse(await fetch('/api/auth/login',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({username,password}),cache:'no-store'}));
+  $('password').value='';
+  if(login.user?.role!=='client'||!login.token){throw new Error('Chỉ tài khoản khách hàng mới được sử dụng cổng này.');}
+  accessToken=login.token;
+  const data=await jsonResponse(await fetch('/api/portal/me',{headers:{'Authorization':'Bearer '+accessToken,'Accept':'application/json'},cache:'no-store'}));
+  render(data);notice('Đăng nhập thành công. Dữ liệu được tải từ hệ thống GODDY Recruit.','success');$('results').scrollIntoView({behavior:'smooth',block:'start'});
+ }catch(error){accessToken=null;clearResults();$('loginSection').hidden=false;notice(error.message||'Không thể kết nối máy chủ.','error');}
+ finally{btn.disabled=false;btn.innerHTML='<i class="fa-solid fa-right-to-bracket"></i> Đăng nhập';}
+});
+})();
+</script>
+</body>
+</html>
