@@ -197,8 +197,9 @@ function switchTab(tabKey) {
   // TASK-051: kiểm tra quyền trước khi chuyển tab
   if (!checkRolePermission(tabKey)) {
 
-    alert(
-      'Bạn không có quyền truy cập chức năng này.'
+    showToast(
+      'Bạn không có quyền truy cập chức năng này.',
+      'warning'
     );
 
     return;
@@ -829,8 +830,9 @@ function openLoginModal() {
 
   } else {
 
-    alert(
-      'Không tìm thấy hộp thoại đăng nhập!'
+    showToast(
+      'Không tìm thấy hộp thoại đăng nhập!',
+      'error'
     );
   }
 }
@@ -974,11 +976,12 @@ async function submitLogin(e) {
       }
 
 
-      alert(
+      showToast(
         'Đăng nhập thành công với vai trò: ' +
         (
           data.user.role || ''
-        ).toUpperCase()
+        ).toUpperCase(),
+        'success'
       );
 
 
@@ -1002,9 +1005,10 @@ async function submitLogin(e) {
 
     } else {
 
-      alert(
+      showToast(
         data.message ||
-        'Đăng nhập thất bại!'
+        'Đăng nhập thất bại!',
+        'error'
       );
     }
 
@@ -1016,8 +1020,9 @@ async function submitLogin(e) {
       err
     );
 
-    alert(
-      'Lỗi kết nối máy chủ!'
+    showToast(
+      'Lỗi kết nối máy chủ!',
+      'error'
     );
   }
 }

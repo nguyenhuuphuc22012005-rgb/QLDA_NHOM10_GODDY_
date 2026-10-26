@@ -1,13 +1,15 @@
+
 /**
  * Module: Quản Lý Hóa Đơn Dịch Vụ Tuyển Dụng
  * TASK-083: Invoice Status Badges
+ * TASK-180: Toast Notifications
  * Chức năng: Danh sách, lọc, xem chi tiết, in và xuất CSV.
  */
 
 (function () {
     'use strict';
 
-    // Nếu chạy backend ở cổng khác 3000, sửa URL này.
+    // Cấu hình API.
     const API_BASE_URL = window.location.protocol === 'file:'
         ? 'http://localhost:3000'
         : window.location.origin;
@@ -97,7 +99,7 @@
             if (window.location.protocol === 'file:') {
                 throw new Error(
                     'Bạn đang mở HTML trực tiếp từ ổ đĩa. ' +
-                    'Hãy chạy backend và mở http://localhost:3000/invoices.html.'
+                    'Hãy chạy backend và mở http://localhost:3000.'
                 );
             }
 
@@ -230,7 +232,7 @@
     async function viewInvoiceDetail(invoiceId) {
         if (!Number.isSafeInteger(Number(invoiceId)) ||
             Number(invoiceId) <= 0) {
-            alert('Mã hóa đơn không hợp lệ!');
+            showToast('Mã hóa đơn không hợp lệ!', 'warning');
             return;
         }
 
@@ -240,7 +242,7 @@
             );
 
             if (!data.success || !data.invoice) {
-                alert('Không tìm thấy thông tin hóa đơn!');
+                showToast('Không tìm thấy thông tin hóa đơn!', 'error');
                 return;
             }
 
@@ -257,10 +259,12 @@
             setText('invDetailCode', inv.invoiceCode);
             setText('invDetailIssueDate', formatDateSafe(inv.issueDate));
             setText('invDetailDueDate', formatDateSafe(inv.dueDate));
+
             setText(
                 'invDetailClientName',
                 inv.Client?.companyName || '-'
             );
+
             setText('invDetailTaxCode', inv.Client?.taxCode || '-');
             setText('invDetailAddress', inv.Client?.address || '-');
 
@@ -305,16 +309,22 @@
                     .getOrCreateInstance(modalElement)
                     .show();
             } else {
-                alert(
-                    `Hóa đơn: ${inv.invoiceCode}\n` +
-                    `Trạng thái: ${inv.status}\n` +
-                    `Còn nợ: ${formatMoneySafe(remainingAmount)}`
+                showToast(
+                    `Hóa đơn: ${inv.invoiceCode} | ` +
+                    `Trạng thái: ${inv.status} | ` +
+                    `Còn nợ: ${formatMoneySafe(remainingAmount)}`,
+                    'info',
+                    8000
                 );
             }
 
         } catch (error) {
             console.error('Lỗi xem chi tiết hóa đơn:', error);
-            alert(error.message || 'Không thể mở chi tiết hóa đơn!');
+
+            showToast(
+                error.message || 'Không thể mở chi tiết hóa đơn!',
+                'error'
+            );
         }
     }
 
@@ -388,9 +398,18 @@
 
             URL.revokeObjectURL(objectUrl);
 
+            showToast(
+                'Đã tạo file CSV danh sách hóa đơn!',
+                'success'
+            );
+
         } catch (error) {
             console.error('Lỗi xuất CSV:', error);
-            alert(error.message || 'Lỗi xuất CSV!');
+
+            showToast(
+                error.message || 'Lỗi xuất CSV!',
+                'error'
+            );
         }
     }
 
@@ -401,14 +420,14 @@
 
     // Gắn sự kiện cho bộ lọc và nút xem chi tiết.
     document.addEventListener('DOMContentLoaded', function () {
-        // Lọc hóa đơn theo trạng thái
+        // Lọc hóa đơn theo trạng thái.
         const statusFilter = document.getElementById('invoiceFilterStatus');
 
         if (statusFilter) {
             statusFilter.addEventListener('change', loadInvoices);
         }
 
-        // Xem chi tiết hóa đơn
+        // Xem chi tiết hóa đơn.
         const tbody = document.getElementById('invoicesTableBody');
 
         if (tbody) {
@@ -421,12 +440,16 @@
             });
         }
 
-        // TASK-086: In trực tiếp và xuất PDF bằng hộp thoại in của trình duyệt.
+        // TASK-086: In trực tiếp và xuất PDF bằng hộp thoại in.
         function printInvoice() {
-            const invoiceSheet = document.getElementById('invoicePrintSheet');
+            const invoiceSheet =
+                document.getElementById('invoicePrintSheet');
 
             if (!invoiceSheet) {
-                alert('Không tìm thấy nội dung hóa đơn để in!');
+                showToast(
+                    'Không tìm thấy nội dung hóa đơn để in!',
+                    'warning'
+                );
                 return;
             }
 
@@ -446,7 +469,7 @@
             pdfButton.dataset.printBound = 'true';
         }
 
-        // Tải danh sách hóa đơn khi mở trang
+        // Tải danh sách hóa đơn khi mở trang.
         loadInvoices();
     });
 
